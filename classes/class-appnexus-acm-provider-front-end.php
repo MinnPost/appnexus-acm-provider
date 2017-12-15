@@ -51,6 +51,8 @@ class Appnexus_ACM_Provider_Front_End {
 			$this->default_url = $protocol . $this->default_domain . '/' . $this->server_path . '/';
 		}
 
+		$this->paragraph_end = '</p>';
+
 		$this->whitelisted_script_urls = array( $this->default_domain );
 
 		$this->add_actions();
@@ -60,12 +62,17 @@ class Appnexus_ACM_Provider_Front_End {
 	private function add_actions() {
 		add_filter( 'acm_output_html', array( $this, 'filter_output_html' ), 10, 2 );
 		add_filter( 'acm_display_ad_codes_without_conditionals', array( $this, 'check_conditionals' ) );
-		add_filter( 'the_content', array( $this, 'insert_inline_ad' ), 10 );
+		$show_in_editor = get_option( $this->option_prefix . 'show_in_editor', '0' );
+		if ( '1' === $show_in_editor ) {
+			add_filter( 'content_edit_pre', array( $this, 'insert_inline_ad_in_editor' ), 10, 2 );
+		} else {
+			add_filter( 'the_content', array( $this, 'insert_and_render_inline_ads' ), 10 );
+		}
 		add_action( 'wp_head', array( $this, 'action_wp_head' ) );
 	}
 
 	/**
-	 * Filter the output HTML to automagically produce the <script> we need
+	 * Filter the output HTML for each ad tag to produce the code we need
 	 */
 	public function filter_output_html( $output_html, $tag_id ) {
 
@@ -133,36 +140,23 @@ class Appnexus_ACM_Provider_Front_End {
 	}
 
 	/**
-	 * Use an inline ad
+	 * Use one or more inline ads, depending on the settings. This does not place them into the post editor, but into the post when it renders.
 	 */
-	public function insert_inline_ad( $content = '' ) {
-		// abort if this is not being called In The Loop.
-		if ( ! in_the_loop() || ! is_main_query() ) {
-			return $content;
-		}
-		if ( ! is_single() ) {
-			return $content;
-		}
-		// abort if this is not a normal post
-		// we should change this to a list of post types
+	public function insert_and_render_inline_ads( $content = '' ) {
+
 		global $wp_query;
 
-		// don't add ads if this post is not a supported type
-		$post_types = get_option( $this->option_prefix . 'post_types', array() );
-		if ( ! in_array( $wp_query->queried_object->post_type, $post_types ) ) {
-			return;
-		}
+		$post_type = $wp_query->queried_object->post_type;
+		$post_id = $wp_query->queried_object->ID;
+		$in_editor = false;
 
-		/*
-		* Abort if this post has the option set to not add ads.
-		*/
-		if ( 'on' === get_post_meta( $wp_query->queried_object->ID, $this->option_prefix . 'prevent_shortcode_addition', true ) ) {
+		// Should we skip rendering ads?
+		$should_we_skip = $this->should_we_skip_ads( $content, $post_type, $post_id, $in_editor );
+		if ( true === $should_we_skip ) {
 			return $content;
 		}
 
-		/*
-		* Check that there isn't a line starting with `[cms_ad`. If there is, render it instead.
-		*/
+		// Render any `[cms_ad` shortcodes, whether they were manually added or added by this plugin
 		if ( preg_match_all( '/\[\s*(cms_ad)\s*[:]?(\s*([\w+\/\.]+))?\]/i', $content, $match ) ) {
 			// $match[0][xx] .... fully matched string [ad:Middle1]
 			// $match[1][xx] .... matched tag type ( ad )
@@ -197,12 +191,7 @@ class Appnexus_ACM_Provider_Front_End {
 
 		$paragraph_positions = array();
 		$last_position = -1;
-		$paragraph_end = '</p>';
-
-		// if we don't have any <p> tags, let's skip the ads for this post
-		if ( ! stripos( $content, $paragraph_end ) ) {
-			return $content;
-		}
+		$paragraph_end = $this->paragraph_end;
 
 		while ( stripos( $content, $paragraph_end, $last_position + 1 ) !== false ) {
 			// Get the position of the end of the next $paragraph_end.
@@ -252,6 +241,69 @@ class Appnexus_ACM_Provider_Front_End {
 
 	}
 
+	/**
+	 * Insert one or more inline ads into the post editor, depending on the settings. Editors can then rearrange them as desired.
+	 */
+	public function insert_inline_ad_in_editor( $content = '', $post_id ) {
+
+		$post_type = get_post_type( $post_id );
+		$in_editor = true;
+
+		// should we skip rendering ads?
+		$should_we_skip = $this->should_we_skip_ads( $content, $post_type, $post_id, $in_editor );
+		if ( true === $should_we_skip ) {
+			return $content;
+		}
+
+		$ad_code_manager = $this->ad_code_manager;
+
+	}
+
+	/**
+	 * Determine whether the current post should get automatic ad insertion.
+	 */
+	private function should_we_skip_ads( $content, $post_type, $post_id, $in_editor ) {
+
+		// This is on the story, so we can access the loop
+		if ( false === $in_editor ) {
+			// Stop if this is not being called In The Loop.
+			if ( ! in_the_loop() || ! is_main_query() ) {
+				return true;
+			}
+			if ( ! is_single() ) {
+				return true;
+			}
+		} else {
+			// Check that there isn't a line starting with `[cms_ad` already.
+			// If there is, stop adding automatic short code(s). Assume the user is doing it manually.
+			if ( preg_match( '/^\[cms_ad/m', $content ) ) {
+				return true;
+			}
+		}
+
+		// Don't add ads if this post is not a supported type
+		$post_types = get_option( $this->option_prefix . 'post_types', array() );
+		if ( ! in_array( $post_type, $post_types ) ) {
+			return true;
+		}
+
+		// Stop if this post has the option set to not add ads.
+		// This field name is stored in the plugin options.
+		if ( 'on' === get_post_meta( $post_id, $this->option_prefix . 'prevent_shortcode_addition', true ) ) {
+			return true;
+		}
+
+		// If we don't have any paragraphs, let's skip the ads for this post
+		if ( ! stripos( $content, $this->paragraph_end ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get ad code to insert for a given tag.
+	 */
 	public function get_code_to_insert( $tag_id ) {
 		// get the code to insert
 		$ad_code_manager = $this->ad_code_manager;

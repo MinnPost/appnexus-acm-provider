@@ -338,6 +338,17 @@ class Appnexus_ACM_Provider_Admin {
 
 			if ( 'overall' === $key ) {
 				$embed_settings = array(
+					'show_in_editor' => array(
+						'title' => __( 'Show shortcode in editor?', 'appnexus-acm-provider' ),
+						'callback' => $callbacks['text'],
+						'page' => $page,
+						'section' => $section,
+						'args' => array(
+							'type' => 'checkbox',
+							'desc' => 'If checked, the [cms_ad] shortcode(s) will show in the post editor, so it/they can be moved around the post as needed.',
+							'default' => '',
+						),
+					),
 					'post_types' => array(
 						'title' => __( 'Post types to embed ads', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['checkboxes'],
