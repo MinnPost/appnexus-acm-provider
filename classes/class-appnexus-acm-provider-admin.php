@@ -326,7 +326,7 @@ class Appnexus_ACM_Provider_Admin {
 			}
 		}
 		$multiple_embeds = array(
-			'is_multiple' => 'Embed Ad Settings',
+			'overall' => 'Embed Ad Settings',
 			'multiple_on' => 'Multiple Embeds',
 			'multiple_off' => 'Single Embed',
 		);
@@ -336,8 +336,19 @@ class Appnexus_ACM_Provider_Admin {
 			$section = $section . '_' . $key;
 			add_settings_section( $section, $value, null, $page );
 
-			if ( 'is_multiple' === $key ) {
+			if ( 'overall' === $key ) {
 				$embed_settings = array(
+					'post_types' => array(
+						'title' => __( 'Post types to embed ads', 'appnexus-acm-provider' ),
+						'callback' => $callbacks['checkboxes'],
+						'page' => $page,
+						'section' => $section,
+						'args' => array(
+							'type' => 'checkboxes',
+							'desc' => 'By default this will list all post types in your installation.',
+							'items' => $this->post_type_options(),
+						),
+					),
 					'multiple_embeds' => array(
 						'title' => __( 'Multiple embeds per story?', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['radio'],
@@ -463,6 +474,21 @@ class Appnexus_ACM_Provider_Admin {
 		$settings[ $key ] = $embed_settings;
 	}
 
+	private function post_type_options() {
+		$types = get_post_types();
+		$items = array();
+		foreach ( $types as $type ) {
+			$item = array(
+				'text' => $type,
+				'value' => $type,
+				'id' => $type,
+				'desc' => '',
+				'default' => '',
+			);
+			$items[] = $item;
+		}
+		return $items;
+	}
 
 	/**
 	* Default display for <input> fields
@@ -560,55 +586,28 @@ class Appnexus_ACM_Provider_Admin {
 	* @param array $args
 	*/
 	public function display_checkboxes( $args ) {
-		$resource = isset( $args['resource'] ) ? $args['resource'] : '';
-		$subresource = isset( $args['subresource'] ) ? $args['subresource'] : '';
 		$type = 'checkbox';
-
 		$name = $args['name'];
-		$group_desc = $args['desc'];
+		$overall_desc = $args['desc'];
 		$options = get_option( $name, array() );
-
-		if ( isset( $options[ $resource ] ) && is_array( $options[ $resource ] ) ) {
-			if ( isset( $options[ $resource ][ $subresource ] ) && is_array( $options[ $resource ][ $subresource ] ) ) {
-				$options = $options[ $resource ][ $subresource ];
-			} else {
-				$options = $options[ $resource ];
-			}
-		}
-
 		foreach ( $args['items'] as $key => $value ) {
 			$text = $value['text'];
 			$id = $value['id'];
 			$desc = $value['desc'];
-			if ( isset( $value['value'] ) ) {
-				$item_value = $value['value'];
-			} else {
-				$item_value = $key;
-			}
 			$checked = '';
-			if ( is_array( $options ) && in_array( (string) $item_value, $options, true ) ) {
+			$field_value = isset( $value['value'] ) ? esc_attr( $value['value'] ) : esc_attr( $key );
+
+			if ( is_array( $options ) && in_array( (string) $field_value, $options, true ) ) {
 				$checked = 'checked';
 			} elseif ( is_array( $options ) && empty( $options ) ) {
 				if ( isset( $value['default'] ) && true === $value['default'] ) {
 					$checked = 'checked';
 				}
 			}
-
-			if ( '' !== $resource ) {
-				// this generates, for example, form_process_mc_methods[lists][]
-				$input_name = $name . '[' . $resource . ']';
-				if ( '' !== $subresource ) {
-					// this generates, for example, form_process_mc_methods[lists][members][]
-					$input_name = $name . '[' . $resource . ']' . '[' . $subresource . ']';
-				}
-			} else {
-				$input_name = $name;
-			}
-
 			echo sprintf( '<div class="checkbox"><label><input type="%1$s" value="%2$s" name="%3$s[]" id="%4$s"%5$s>%6$s</label></div>',
 				esc_attr( $type ),
-				esc_attr( $item_value ),
-				esc_attr( $input_name ),
+				$field_value,
+				esc_attr( $name ),
 				esc_attr( $id ),
 				esc_html( $checked ),
 				esc_html( $text )
@@ -619,13 +618,11 @@ class Appnexus_ACM_Provider_Admin {
 				);
 			}
 		}
-
-		if ( '' !== $group_desc ) {
+		if ( '' !== $overall_desc ) {
 			echo sprintf( '<p class="description">%1$s</p>',
-				esc_html( $group_desc )
+				esc_html( $overall_desc )
 			);
 		}
-
 	}
 
 	/**
@@ -634,21 +631,11 @@ class Appnexus_ACM_Provider_Admin {
 	* @param array $args
 	*/
 	public function display_radio( $args ) {
-		$resource = isset( $args['resource'] ) ? $args['resource'] : '';
-		$subresource = isset( $args['subresource'] ) ? $args['subresource'] : '';
 		$type = 'radio';
 
 		$name = $args['name'];
 		$group_desc = $args['desc'];
 		$options = get_option( $name, array() );
-
-		if ( isset( $options[ $resource ] ) && is_array( $options[ $resource ] ) ) {
-			if ( isset( $options[ $resource ][ $subresource ] ) && is_array( $options[ $resource ][ $subresource ] ) ) {
-				$options = $options[ $resource ][ $subresource ];
-			} else {
-				$options = $options[ $resource ];
-			}
-		}
 
 		foreach ( $args['items'] as $key => $value ) {
 			$text = $value['text'];
@@ -668,16 +655,7 @@ class Appnexus_ACM_Provider_Admin {
 				}
 			}
 
-			if ( '' !== $resource ) {
-				// this generates, for example, form_process_mc_methods[lists][]
-				$input_name = $name . '[' . $resource . ']';
-				if ( '' !== $subresource ) {
-					// this generates, for example, form_process_mc_methods[lists][members][]
-					$input_name = $name . '[' . $resource . ']' . '[' . $subresource . ']';
-				}
-			} else {
-				$input_name = $name;
-			}
+			$input_name = $name;
 
 			echo sprintf( '<div class="radio"><label><input type="%1$s" value="%2$s" name="%3$s[]" id="%4$s"%5$s>%6$s</label></div>',
 				esc_attr( $type ),

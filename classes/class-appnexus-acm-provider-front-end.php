@@ -120,6 +120,9 @@ class Appnexus_ACM_Provider_Front_End {
 
 	}
 
+	/**
+	 * Whether to show ads that don't have any conditionals
+	 */
 	public function check_conditionals() {
 		$show_without_conditionals = get_option( $this->option_prefix . 'show_ads_without_conditionals', '0' );
 		if ( '1' === $show_without_conditionals ) {
@@ -143,8 +146,11 @@ class Appnexus_ACM_Provider_Front_End {
 		// abort if this is not a normal post
 		// we should change this to a list of post types
 		global $wp_query;
-		if ( 'post' !== $wp_query->queried_object->post_type ) {
-			return $content;
+
+		// don't add ads if this post is not a supported type
+		$post_types = get_option( $this->option_prefix . 'post_types', array() );
+		if ( ! in_array( $wp_query->queried_object->post_type, $post_types ) ) {
+			return;
 		}
 
 		/*
