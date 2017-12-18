@@ -1,12 +1,12 @@
 var $ = window.jQuery;
 
 function showEmbedOptions(field, multiple) {
-	if ( multiple == 'no' ) {
+	if ( multiple == '0' ) {
 		$(field).parents('form').find('h2:nth-of-type(2)').hide();
 		$(field).parents('form').find('h2:nth-of-type(3)').show();
 		$(field).parents('form').find('table:nth-of-type(2)').hide();
 		$(field).parents('form').find('table:nth-of-type(3)').show();
-	} else if ( multiple == 'yes' ) {
+	} else if ( multiple == '1' ) {
 		$(field).parents('form').find('h2:nth-of-type(2)').show();
 		$(field).parents('form').find('h2:nth-of-type(3)').hide();
 		$(field).parents('form').find('table:nth-of-type(2)').show();
