@@ -289,7 +289,7 @@ class Appnexus_ACM_Provider_Front_End {
 
 		// Stop if this post has the option set to not add ads.
 		// This field name is stored in the plugin options.
-		if ( 'on' === get_post_meta( $post_id, $this->option_prefix . 'prevent_shortcode_addition', true ) ) {
+		if ( 'on' === get_post_meta( $post_id, $this->option_prefix . 'prevent_ads_field', true ) ) {
 			return true;
 		}
 
