@@ -22,7 +22,9 @@ $(document).on('click', 'input[name="appnexus_acm_provider_multiple_embeds[]"]',
 
 $(document).ready(function() {
 	var fieldname = 'input[name="appnexus_acm_provider_multiple_embeds[]"]';
-	var field = $(fieldname);
-	var multiple = $(fieldname + ':checked').val();
-	showEmbedOptions(field, multiple);
+	if ( $(fieldname).length) {
+		var field = $(fieldname);
+		var multiple = $(fieldname + ':checked').val();
+		showEmbedOptions(field, multiple);
+	}
 });
