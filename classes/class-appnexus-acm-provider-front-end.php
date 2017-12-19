@@ -426,9 +426,12 @@ class Appnexus_ACM_Provider_Front_End {
 					break;
 				case 'sx':
 					$not_tags = implode( ',', array_column( $ad_tags, 'tag' ) );
-					$output_html = '<iframe src="' . $this->default_url . 'adstream_sx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $not_tags . '!' . $tag_id . '" frameborder="0" scrolling="no" marginheight="0"></iframe>';
-					// lazy load
-					$output_html = apply_filters( 'easy_lazy_loader_html', $output_html );
+					$output_html = '<iframe src="' . $this->default_url . 'adstream_sx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $not_tags . '!' . $tag_id . '?_RM_IP_=' . $_SERVER['REMOTE_ADDR'] . '" frameborder="0" scrolling="no" marginheight="0"></iframe>';
+					// check for the existence of "easy_lazy_loader_html" filter
+					if ( array_key_exists( 'easy_lazy_loader_html', $GLOBALS['wp_filter'] ) ) {
+						// lazy load
+						$output_html = apply_filters( 'easy_lazy_loader_html', $output_html );
+					}
 					break;
 				case 'dx':
 					break;
