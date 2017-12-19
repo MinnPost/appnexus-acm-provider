@@ -323,7 +323,7 @@ class Appnexus_ACM_Provider_Front_End {
 					break;
 				case 'sx':
 					$not_tags = implode( ',', array_column( $ad_tags, 'tag' ) );
-					$output_html = '<iframe src="' . $this->default_url . 'adstream_sx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $not_tags . '!' . $tag_id . '" frameborder="0" scrolling="no" marginheight="0"><a href="' . $this->default_url . 'click_nx.ads/MP/' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $not_tags . '!' . $tag_id . '"><img src="' . $this->default_url . 'adstream_nx.ads/MP/' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $not_tags . '!' . $tag_id . '"></a></iframe>';
+					$output_html = '<iframe src="' . $this->default_url . 'adstream_sx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $not_tags . '!' . $tag_id . '" frameborder="0" scrolling="no" marginheight="0"></iframe>';
 					// lazy load
 					$output_html = apply_filters( 'easy_lazy_loader_html', $output_html );
 					break;
