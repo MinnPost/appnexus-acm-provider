@@ -462,6 +462,22 @@ class Appnexus_ACM_Provider_Front_End {
 					$output_html = '<script>OAS_AD("' . $tag_id . '");</script>';
 					break;
 				case 'nx':
+					$output_html = '';
+					$output_html .= '<script>
+					<!--
+					OAS_url = "' . $this->default_domain . '";
+					OAS_sitepage = "' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '";
+					OAS_pos = "' . $tag_id . '";';
+					//OAS_query = 'Keyword';
+					$output_html .= 'var OAS_rns = (Math.random() + \"\").substring(2, 11);';
+					$output_html .= "document.write('<scr' + 'ipt src=\"' + OAS_url + '/$this->server_path/adstream_jx.ads/' + OAS_sitepage + '/1' + OAS_RNS + '@' + OAS_pos + '?' + OAS_query + '\"></scr' + 'ipt>');
+					// --
+					</script>";
+					$output_html .= '<noscript>
+					<a href="' . $this->default_url . 'click_nx.ads' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '@' . $tag_id . '">
+						<img src="' . $this->default_url . 'adstream_nx.ads' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '@' . $tag_id . '" border="0" />
+						</a>
+						</noscript>';
 					break;
 				case 'sx':
 					$not_tags = implode( ',', array_column( $ad_tags, 'tag' ) );
