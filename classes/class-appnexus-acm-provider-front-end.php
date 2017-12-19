@@ -195,72 +195,7 @@ class Appnexus_ACM_Provider_Front_End {
 
 		$ad_code_manager = $this->ad_code_manager;
 
-		$multiple_embeds = get_option( $this->option_prefix . 'multiple_embeds', '0' );
-		if ( is_array( $multiple_embeds ) ) {
-			$multiple_embeds = $multiple_embeds[0];
-		}
-
-		if ( '1' === $multiple_embeds ) {
-			$insert_every_paragraphs = get_option( $this->option_prefix . 'insert_every_paragraphs', 4 );
-			$maximum_embed_count = get_option( $this->option_prefix . 'maximum_embed_count', 10 );
-			$minimum_paragraph_count = get_option( $this->option_prefix . 'minimum_paragraph_count', 6 );
-		} else {
-			$tag_id = get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
-			$top_offset = get_option( $this->option_prefix . 'auto_embed_top_offset', 1000 );
-			$bottom_offset = get_option( $this->option_prefix . 'auto_embed_bottom_offset', 400 );
-		}
-
-		$end = strlen( $content );
-		$position = $end;
-
-		$paragraph_positions = array();
-		$last_position = -1;
-		$paragraph_end = $this->paragraph_end;
-
-		while ( stripos( $content, $paragraph_end, $last_position + 1 ) !== false ) {
-			// Get the position of the end of the next $paragraph_end.
-			$last_position = stripos( $content, $paragraph_end, $last_position + 1 ) + 3; // what does the 3 mean?
-			$paragraph_positions[] = $last_position;
-		}
-
-		// If the total number of paragraphs is bigger than the minimum number of paragraphs
-		// It is assumed that $minimum_paragraph_count > $insert_every_paragraphs * $maximum_embed_count
-		if ( count( $paragraph_positions ) >= $minimum_paragraph_count ) {
-			// How many shortcodes have been added?
-			$n = 0;
-			// Safety check number: stores the position of the last insertion.
-			$previous_position = 0;
-			$i = 0;
-			while ( $i < count( $paragraph_positions ) && $n <= $maximum_embed_count ) {
-				// Modulo math to only output shortcode after $insert_every_paragraphs closing paragraph tags.
-				// +1 because of zero-based indexing.
-				if ( 0 === ( $i + 1 ) % $insert_every_paragraphs && isset( $paragraph_positions[ $i ] ) ) {
-					// make a shortcode using the number of the shorcode that will be added.
-					// Using "" here so we can interpolate the variable.
-					$shortcode = $this->get_code_to_insert( 'x' . ( 100 + (int) $n ) );
-					//$shortcode = "[cms_ad:$n]";
-					$position = $paragraph_positions[ $i ] + 1;
-					// Safety check:
-					// If the position we're adding the shortcode is at a lower point in the story than the position we're adding,
-					// Then something has gone wrong and we should insert no more shortcodes.
-					if ( $position > $previous_position ) {
-						$content = substr_replace( $content, $shortcode, $paragraph_positions[ $i ] + 1, 0 );
-						// Increase the saved last position.
-						$previous_position = $position;
-						// Increment number of shortcodes added to the post.
-						$n++;
-					}
-					// Increase the position of later shortcodes by the length of the current shortcode.
-					foreach ( $paragraph_positions as $j => $pp ) {
-						if ( $j > $i ) {
-							$paragraph_positions[ $j ] = $pp + strlen( $shortcode );
-						}
-					}
-				}
-				$i++;
-			}
-		}
-
+		$content = $this->insert_ads_into_content( $content, false );
 		return $content;
 
 	}
@@ -287,6 +222,9 @@ class Appnexus_ACM_Provider_Front_End {
 		}
 
 		$ad_code_manager = $this->ad_code_manager;
+
+		$content = $this->insert_ads_into_content( $content, true );
+		return $content;
 
 	}
 
@@ -339,6 +277,124 @@ class Appnexus_ACM_Provider_Front_End {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Place the ad code, or cms shortcode for the ad, into the post body as many times, and in the right location.
+	 *
+	 * @param string $content
+	 * @param bool $in_editor
+	 *
+	 * @return $content
+	 * return the post content with shortcodes for ads inside it at the proper places
+	 *
+	 */
+	private function insert_ads_into_content( $content, $in_editor = false ) {
+		$multiple_embeds = get_option( $this->option_prefix . 'multiple_embeds', '0' );
+		if ( is_array( $multiple_embeds ) ) {
+			$multiple_embeds = $multiple_embeds[0];
+		}
+
+		$end = strlen( $content );
+		$position = $end;
+
+		if ( '1' === $multiple_embeds ) {
+
+			$insert_every_paragraphs = get_option( $this->option_prefix . 'insert_every_paragraphs', 4 );
+			$maximum_embed_count = get_option( $this->option_prefix . 'maximum_embed_count', 10 );
+			$minimum_paragraph_count = get_option( $this->option_prefix . 'minimum_paragraph_count', 6 );
+
+			$paragraph_positions = array();
+			$last_position = -1;
+			$paragraph_end = $this->paragraph_end;
+
+			while ( stripos( $content, $paragraph_end, $last_position + 1 ) !== false ) {
+				// Get the position of the end of the next $paragraph_end.
+				$last_position = stripos( $content, $paragraph_end, $last_position + 1 ) + 3; // what does the 3 mean?
+				$paragraph_positions[] = $last_position;
+			}
+
+			// If the total number of paragraphs is bigger than the minimum number of paragraphs
+			// It is assumed that $minimum_paragraph_count > $insert_every_paragraphs * $maximum_embed_count
+			if ( count( $paragraph_positions ) >= $minimum_paragraph_count ) {
+				// How many shortcodes have been added?
+				$n = 0;
+				// Safety check number: stores the position of the last insertion.
+				$previous_position = 0;
+				$i = 0;
+				while ( $i < count( $paragraph_positions ) && $n <= $maximum_embed_count ) {
+					// Modulo math to only output shortcode after $insert_every_paragraphs closing paragraph tags.
+					// +1 because of zero-based indexing.
+					if ( 0 === ( $i + 1 ) % $insert_every_paragraphs && isset( $paragraph_positions[ $i ] ) ) {
+						// make a shortcode using the number of the shorcode that will be added.
+						// Using "" here so we can interpolate the variable.
+						if ( false === $in_editor ) {
+							$shortcode = $this->get_code_to_insert( 'x' . ( 100 + (int) $n ) );
+						} elseif ( true === $in_editor ) {
+							$shortcode = '[cms_ad:' . 'x' . ( 100 + (int) $n ) . ']';
+						}
+						$position = $paragraph_positions[ $i ] + 1;
+						// Safety check:
+						// If the position we're adding the shortcode is at a lower point in the story than the position we're adding,
+						// Then something has gone wrong and we should insert no more shortcodes.
+						if ( $position > $previous_position ) {
+							$content = substr_replace( $content, $shortcode, $paragraph_positions[ $i ] + 1, 0 );
+							// Increase the saved last position.
+							$previous_position = $position;
+							// Increment number of shortcodes added to the post.
+							$n++;
+						}
+						// Increase the position of later shortcodes by the length of the current shortcode.
+						foreach ( $paragraph_positions as $j => $pp ) {
+							if ( $j > $i ) {
+								$paragraph_positions[ $j ] = $pp + strlen( $shortcode );
+							}
+						}
+					}
+					$i++;
+				}
+			}
+		} else {
+			$tag_id = get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
+			$top_offset = get_option( $this->option_prefix . 'auto_embed_top_offset', 1000 );
+			$bottom_offset = get_option( $this->option_prefix . 'auto_embed_bottom_offset', 400 );
+
+			// if the content is longer than the minimum ad spot find a break.
+			// otherwise place the ad at the end
+			if ( $position > $top_offset ) {
+				// find the break point
+				$breakpoints = array(
+					'</p>' => 4,
+					'<br />' => 6,
+					'<br/>' => 5,
+					'<br>' => 4,
+					'<!--pagebreak-->' => 0,
+					'<p>' => 0,
+				);
+				// We use strpos on the reversed needle and haystack for speed.
+				foreach ( $breakpoints as $point => $offset ) {
+					$length = stripos( $content, $point, $top_offset );
+					if ( false !== $length ) {
+						$position = min( $position, $length + $offset );
+					}
+				}
+			}
+			if ( false === $in_editor ) {
+				// If the position is at or near the end of the article.
+				if ( $position > $end - $bottom_offset ) {
+					$position = $end;
+					$shortcode = $this->get_code_to_insert( $tag_id, 'minnpost-ads-ad-article-end' );
+				} else {
+					$shortcode = $this->get_code_to_insert( $tag_id, 'minnpost-ads-ad-article-middle' );
+				}
+			} else {
+				$shortcode = '[cms_ad:' . $tag_id . ']';
+			}
+
+			$content = substr_replace( $content, $shortcode, $position, 0 );
+		}
+
+		return $content;
 	}
 
 	/**
