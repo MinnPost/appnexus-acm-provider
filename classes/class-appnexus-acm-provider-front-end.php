@@ -105,29 +105,68 @@ class Appnexus_ACM_Provider_Front_End {
 						}
 					}
 				}
-				$output_html = "
-				<!-- OAS HEADER SETUP begin -->
-				<script>
-				  /* <![CDATA[ */
-				  // Configuration
-				  var OAS_url = '" . $this->default_url . "';
-				  var OAS_sitepage = 'MP' + window.location.pathname;
-				  var OAS_listpos = '" . implode( ',', $tags ) . "';
-				  var OAS_query = '';
-				  var OAS_target = '_top';
-				  
-				  var OAS_rns = (Math.random() + \"\").substring(2, 11);
-				  document.write('<scr' + 'ipt src=\"' + OAS_url + 'adstream_mjx.ads/' + OAS_sitepage + '/1' + OAS_rns + '@' + OAS_listpos + '?' + OAS_query + '\">' + '<\/script>');
-				  
-				  function OAS_AD(pos) {
-				    if (typeof OAS_RICH != 'undefined') {
-				      OAS_RICH(pos);
-				    }
-				  }
-				  /* ]]> */
-				</script>  
-				<!-- OAS HEADER SETUP end --> 
-				";
+				$tag_type = get_option( $this->option_prefix . 'ad_tag_type', '' );
+				switch ( $tag_type ) {
+					case 'jx':
+						break;
+					case 'mjx':
+						$output_html = "
+						<!-- OAS HEADER SETUP begin -->
+						<script>
+						  /* <![CDATA[ */
+						  // Configuration
+						  var OAS_url = '" . $this->default_url . "';
+						  var OAS_sitepage = 'MP' + window.location.pathname;
+						  var OAS_listpos = '" . implode( ',', $tags ) . "';
+						  var OAS_query = '';
+						  var OAS_target = '_top';
+						  
+						  var OAS_rns = (Math.random() + \"\").substring(2, 11);
+						  document.write('<scr' + 'ipt src=\"' + OAS_url + 'adstream_mjx.ads/' + OAS_sitepage + '/1' + OAS_rns + '@' + OAS_listpos + '?' + OAS_query + '\">' + '<\/script>');
+						  
+						  function OAS_AD(pos) {
+						    if (typeof OAS_RICH != 'undefined') {
+						      OAS_RICH(pos);
+						    }
+						  }
+						  /* ]]> */
+						</script>  
+						<!-- OAS HEADER SETUP end --> 
+						";
+						break;
+					case 'nx':
+						break;
+					case 'sx':
+						break;
+					case 'dx':
+						// 'delivery.uat.247realmedia.com'; //Define OAS URL
+						// delivery.oasc17.247realmedia.com
+						$output_html = '';
+						$output_html .= "
+						<script>
+						  var oas_tag = oas_tag || {};
+						  oas_tag.url = '" . $this->default_url . "';
+						  oas_tag.sizes = function() {
+						  ";
+						foreach ( $tags as $tag ) {
+							$output_html .= 'oas_tag.definePOS("' . $tag . '");' . "\n";
+						}
+						$output_html .= '};' . "\n";
+						$output_html .= 'oas_tag.site_page = "MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '";' . "\n";
+						$output_html .= "(function() {
+							oas_tag.version ='1';oas_tag.loadAd = oas_tag.loadAd || function(){};
+							var oas = document.createElement('script'),
+				              protocol = 'https:' == document.location.protocol?'https://':'http://',
+				              node = document.getElementsByTagName('script')[0];
+				              oas.type = 'text/javascript'; oas.async = true;
+				              oas.src = oas_tag.url + '/om/' + oas_tag.version + '.js';
+				              node.parentNode.insertBefore(oas, node);
+						})();
+						</script>";
+						break;
+					default:
+						break;
+				}
 
 				break;
 			default:
@@ -434,6 +473,7 @@ class Appnexus_ACM_Provider_Front_End {
 					}
 					break;
 				case 'dx':
+					$output_html = '<div id="oas_' . $tag_id . '"></div><script>oas_tag.loadAd("' . $tag_id . '");</script>';
 					break;
 				default:
 					break;
@@ -478,6 +518,7 @@ class Appnexus_ACM_Provider_Front_End {
 			case 'sx':
 				break;
 			case 'dx':
+				do_action( 'acm_tag', 'appnexus_head' );
 				break;
 			default:
 				# code...
