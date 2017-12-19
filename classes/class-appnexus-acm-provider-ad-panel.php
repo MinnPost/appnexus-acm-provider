@@ -15,16 +15,16 @@ if ( ! class_exists( 'Appnexus_ACM_Provider' ) ) {
 class Appnexus_ACM_Provider_Ad_Panel {
 
 	protected $option_prefix;
-	protected $slug;
 	protected $version;
+	protected $slug;
 	protected $ad_code_manager;
 
 	/**
 	* Constructor which sets up admin pages
 	*
 	* @param string $option_prefix
-	* @param string $slug
 	* @param string $version
+	* @param string $slug
 	* @param object $ad_code_manager
 	* @throws \Exception
 	*/

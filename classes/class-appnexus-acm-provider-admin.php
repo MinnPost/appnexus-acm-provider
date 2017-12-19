@@ -15,8 +15,8 @@ if ( ! class_exists( 'Appnexus_ACM_Provider' ) ) {
 class Appnexus_ACM_Provider_Admin {
 
 	protected $option_prefix;
-	protected $slug;
 	protected $version;
+	protected $slug;
 	protected $ad_panel;
 	protected $front_end;
 
@@ -24,8 +24,8 @@ class Appnexus_ACM_Provider_Admin {
 	* Constructor which sets up admin pages
 	*
 	* @param string $option_prefix
-	* @param string $slug
 	* @param string $version
+	* @param string $slug
 	* @param object $ad_panel
 	* @param object $front_end
 	* @throws \Exception

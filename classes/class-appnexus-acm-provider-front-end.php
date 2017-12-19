@@ -15,8 +15,8 @@ if ( ! class_exists( 'Appnexus_ACM_Provider' ) ) {
 class Appnexus_ACM_Provider_Front_End {
 
 	protected $option_prefix;
-	protected $slug;
 	protected $version;
+	protected $slug;
 	protected $ad_code_manager;
 	protected $ad_panel;
 
@@ -24,8 +24,8 @@ class Appnexus_ACM_Provider_Front_End {
 	* Constructor which sets up front end rendering
 	*
 	* @param string $option_prefix
-	* @param string $slug
 	* @param string $version
+	* @param string $slug
 	* @param object $ad_code_manager
 	* @param object $ad_panel
 	* @throws \Exception

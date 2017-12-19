@@ -13,16 +13,18 @@ Text Domain: appnexus-acm-provider
 
 class Appnexus_ACM_Provider extends ACM_Provider {
 
+	private $option_prefix;
 	private $version;
+	private $slug;
+
 	public $default_domain;
 	public $server_path;
 	public $default_url;
 
 	public function __construct() {
 
-		$this->version = '0.0.3';
-
 		$this->option_prefix = 'appnexus_acm_provider_';
+		$this->version = '0.0.3';
 		$this->slug = 'appnexus-acm-provider';
 
 		global $ad_code_manager;
