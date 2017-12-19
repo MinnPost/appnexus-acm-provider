@@ -55,10 +55,16 @@ class Appnexus_ACM_Provider_Front_End {
 
 		$this->whitelisted_script_urls = array( $this->default_domain );
 
+		$this->random_number = mt_rand();
+
 		$this->add_actions();
 
 	}
 
+	/**
+	* Create the action hooks to filter the html, render the ads, and the shortcodes
+	*
+	*/
 	private function add_actions() {
 		add_filter( 'acm_output_html', array( $this, 'filter_output_html' ), 10, 2 );
 		add_filter( 'acm_display_ad_codes_without_conditionals', array( $this, 'check_conditionals' ) );
@@ -73,13 +79,18 @@ class Appnexus_ACM_Provider_Front_End {
 
 	/**
 	 * Filter the output HTML for each ad tag to produce the code we need
+	 * @param string $output_html
+	 * @param string $tag_id
+	 *
+	 * @return $output_html
+	 * return filtered html for the ad code
 	 */
 	public function filter_output_html( $output_html, $tag_id ) {
 
 		$ad_code_manager = $this->ad_code_manager;
 		$ad_tags = $ad_code_manager->ad_tag_ids;
 
-		$output_script = '';
+		$output_html = '';
 		switch ( $tag_id ) {
 			case 'appnexus_head':
 				$tags = array();
@@ -91,7 +102,7 @@ class Appnexus_ACM_Provider_Front_End {
 						}
 					}
 				}
-				$output_script = "
+				$output_html = "
 				<!-- OAS HEADER SETUP begin -->
 				<script>
 				  /* <![CDATA[ */
@@ -119,16 +130,19 @@ class Appnexus_ACM_Provider_Front_End {
 			default:
 				$matching_ad_code = $ad_code_manager->get_matching_ad_code( $tag_id );
 				if ( ! empty( $matching_ad_code ) ) {
-					$output_script = $this->get_code_to_insert( $tag_id );
+					$output_html = $this->get_code_to_insert( $tag_id );
 				}
 		} // End switch().
 
-		return $output_script;
+		return $output_html;
 
 	}
 
 	/**
 	 * Whether to show ads that don't have any conditionals
+	 *
+	 * @return bool
+	 *
 	 */
 	public function check_conditionals() {
 		$show_without_conditionals = get_option( $this->option_prefix . 'show_ads_without_conditionals', '0' );
@@ -141,6 +155,12 @@ class Appnexus_ACM_Provider_Front_End {
 
 	/**
 	 * Use one or more inline ads, depending on the settings. This does not place them into the post editor, but into the post when it renders.
+	 *
+	 * @param string $content
+	 *
+	 * @return $content
+	 * return the post content with code for ads inside it at the proper places
+	 *
 	 */
 	public function insert_and_render_inline_ads( $content = '' ) {
 
@@ -148,7 +168,7 @@ class Appnexus_ACM_Provider_Front_End {
 
 		$post_type = $wp_query->queried_object->post_type;
 		$post_id = $wp_query->queried_object->ID;
-		$in_editor = false;
+		$in_editor = false; // we are not in the editor right now
 
 		// Should we skip rendering ads?
 		$should_we_skip = $this->should_we_skip_ads( $content, $post_type, $post_id, $in_editor );
@@ -157,6 +177,7 @@ class Appnexus_ACM_Provider_Front_End {
 		}
 
 		// Render any `[cms_ad` shortcodes, whether they were manually added or added by this plugin
+		// this should also be used to render the shortcodes added in the editor
 		if ( preg_match_all( '/\[\s*(cms_ad)\s*[:]?(\s*([\w+\/\.]+))?\]/i', $content, $match ) ) {
 			// $match[0][xx] .... fully matched string [ad:Middle1]
 			// $match[1][xx] .... matched tag type ( ad )
@@ -243,6 +264,13 @@ class Appnexus_ACM_Provider_Front_End {
 
 	/**
 	 * Insert one or more inline ads into the post editor, depending on the settings. Editors can then rearrange them as desired.
+	 *
+	 * @param string $content
+	 * @param int $post_id
+	 *
+	 * @return $content
+	 * return the post content into the editor with shortcodes for ads inside it at the proper places
+	 *
 	 */
 	public function insert_inline_ad_in_editor( $content = '', $post_id ) {
 
@@ -261,6 +289,15 @@ class Appnexus_ACM_Provider_Front_End {
 
 	/**
 	 * Determine whether the current post should get automatic ad insertion.
+	 *
+	 * @param string $content
+	 * @param string $post_type
+	 * @param int $post_id
+	 * @param bool $in_editor
+	 *
+	 * @return bool
+	 * return true to skip rendering ads, false otherwise
+	 *
 	 */
 	private function should_we_skip_ads( $content, $post_type, $post_id, $in_editor ) {
 
@@ -303,8 +340,15 @@ class Appnexus_ACM_Provider_Front_End {
 
 	/**
 	 * Get ad code to insert for a given tag.
+	 *
+	 * @param string $tag_id
+	 * @param string $class
+	 *
+	 * @return $output_html
+	 * return the necessary ad code for the specified tag type
+	 *
 	 */
-	public function get_code_to_insert( $tag_id ) {
+	public function get_code_to_insert( $tag_id, $class = '' ) {
 		// get the code to insert
 		$ad_code_manager = $this->ad_code_manager;
 		$ad_tags = $ad_code_manager->ad_tag_ids;
@@ -357,7 +401,7 @@ class Appnexus_ACM_Provider_Front_End {
 	}
 
 	/**
-	 * Add the initialization code in the head
+	 * Add the initialization code in the head if the tag type requires it.
 	 */
 	public function action_wp_head() {
 		$tag_type = get_option( $this->option_prefix . 'ad_tag_type', '' );
