@@ -68,12 +68,15 @@ class Appnexus_ACM_Provider_Front_End {
 	private function add_actions() {
 		add_filter( 'acm_output_html', array( $this, 'filter_output_html' ), 10, 2 );
 		add_filter( 'acm_display_ad_codes_without_conditionals', array( $this, 'check_conditionals' ) );
+
+		// disperse shortcodes in the editor if the settings say to
 		$show_in_editor = get_option( $this->option_prefix . 'show_in_editor', '0' );
 		if ( '1' === $show_in_editor ) {
 			add_filter( 'content_edit_pre', array( $this, 'insert_inline_ad_in_editor' ), 10, 2 );
-		} else {
-			add_filter( 'the_content', array( $this, 'insert_and_render_inline_ads' ), 10 );
 		}
+
+		// always either replace the shortcodes with ads, or if they are absent disperse ad codes throughout the content
+		add_filter( 'the_content', array( $this, 'insert_and_render_inline_ads' ), 10 );
 		add_action( 'wp_head', array( $this, 'action_wp_head' ) );
 	}
 
