@@ -19,6 +19,7 @@ class Appnexus_ACM_Provider_Front_End {
 	protected $slug;
 	protected $ad_code_manager;
 	protected $ad_panel;
+	protected $ad_tag_ids;
 
 	/**
 	* Constructor which sets up front end rendering
@@ -28,15 +29,17 @@ class Appnexus_ACM_Provider_Front_End {
 	* @param string $slug
 	* @param object $ad_code_manager
 	* @param object $ad_panel
+	* @param array $ad_tag_ids
 	* @throws \Exception
 	*/
-	public function __construct( $option_prefix, $version, $slug, $ad_code_manager, $ad_panel ) {
+	public function __construct( $option_prefix, $version, $slug, $ad_code_manager, $ad_panel, $ad_tag_ids ) {
 
 		$this->option_prefix = $option_prefix;
 		$this->version = $version;
 		$this->slug = $slug;
 		$this->ad_code_manager = $ad_code_manager;
 		$this->ad_panel = $ad_panel;
+		$this->ad_tag_ids = $ad_tag_ids;
 
 		$this->default_domain = trim( get_option( $this->option_prefix . 'default_domain', '' ) );
 		$this->server_path = trim( get_option( $this->option_prefix . 'server_path', '' ) );
@@ -56,6 +59,8 @@ class Appnexus_ACM_Provider_Front_End {
 		$this->whitelisted_script_urls = array( $this->default_domain );
 
 		$this->random_number = mt_rand();
+
+		$this->tag_type = get_option( $this->option_prefix . 'ad_tag_type', '' );
 
 		$this->add_actions();
 
@@ -105,7 +110,7 @@ class Appnexus_ACM_Provider_Front_End {
 						}
 					}
 				}
-				$tag_type = get_option( $this->option_prefix . 'ad_tag_type', '' );
+				$tag_type = $this->tag_type;
 				switch ( $tag_type ) {
 					case 'jx':
 						break;
@@ -120,18 +125,18 @@ class Appnexus_ACM_Provider_Front_End {
 						  var OAS_listpos = '" . implode( ',', $tags ) . "';
 						  var OAS_query = '';
 						  var OAS_target = '_top';
-						  
+
 						  var OAS_rns = (Math.random() + \"\").substring(2, 11);
 						  document.write('<scr' + 'ipt src=\"' + OAS_url + 'adstream_mjx.ads/' + OAS_sitepage + '/1' + OAS_rns + '@' + OAS_listpos + '?' + OAS_query + '\">' + '<\/script>');
-						  
+
 						  function OAS_AD(pos) {
 						    if (typeof OAS_RICH != 'undefined') {
 						      OAS_RICH(pos);
 						    }
 						  }
 						  /* ]]> */
-						</script>  
-						<!-- OAS HEADER SETUP end --> 
+						</script>
+						<!-- OAS HEADER SETUP end -->
 						";
 						break;
 					case 'nx':
@@ -454,7 +459,7 @@ class Appnexus_ACM_Provider_Front_End {
 		$matching_ad_code = $ad_code_manager->get_matching_ad_code( $tag_id );
 		if ( ! empty( $matching_ad_code ) ) {
 
-			$tag_type = get_option( $this->option_prefix . 'ad_tag_type', '' );
+			$tag_type = $this->tag_type;
 			switch ( $tag_type ) {
 				case 'jx':
 					break;
@@ -522,7 +527,7 @@ class Appnexus_ACM_Provider_Front_End {
 	 * Add the initialization code in the head if the tag type requires it.
 	 */
 	public function action_wp_head() {
-		$tag_type = get_option( $this->option_prefix . 'ad_tag_type', '' );
+		$tag_type = $this->tag_type;
 		switch ( $tag_type ) {
 			case 'jx':
 				break;

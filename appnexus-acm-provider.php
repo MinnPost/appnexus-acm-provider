@@ -69,7 +69,7 @@ class Appnexus_ACM_Provider extends ACM_Provider {
 	*/
 	private function front_end() {
 		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-' . $this->slug . '-front-end.php' );
-		$front_end = new Appnexus_ACM_Provider_Front_End( $this->option_prefix, $this->version, $this->slug, $this->ad_code_manager, $this->ad_panel );
+		$front_end = new Appnexus_ACM_Provider_Front_End( $this->option_prefix, $this->version, $this->slug, $this->ad_code_manager, $this->ad_panel, $this->ad_tag_ids );
 		return $front_end;
 	}
 
