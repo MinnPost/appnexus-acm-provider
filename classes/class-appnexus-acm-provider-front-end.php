@@ -62,6 +62,8 @@ class Appnexus_ACM_Provider_Front_End {
 
 		$this->tag_type = get_option( $this->option_prefix . 'ad_tag_type', '' );
 
+		$this->all_ads = $this->store_ad_response();
+
 		$this->add_actions();
 
 	}
@@ -83,6 +85,23 @@ class Appnexus_ACM_Provider_Front_End {
 		// always either replace the shortcodes with ads, or if they are absent disperse ad codes throughout the content
 		add_filter( 'the_content', array( $this, 'insert_and_render_inline_ads' ), 10 );
 		add_action( 'wp_head', array( $this, 'action_wp_head' ) );
+	}
+
+	private function store_ad_response() {
+		$all_ads = array();
+
+		if ( 'dx' === $this->tag_type ) {
+			$dx_url = $this->default_url . 'adstream_dx.ads/json/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . implode( ',', array_column( $this->ad_tag_ids, 'tag' ) );
+			$request = wp_remote_get( $dx_url );
+			if ( is_wp_error( $request ) ) {
+				return $all_ads;
+			}
+			$body = wp_remote_retrieve_body( $request );
+			$data = json_decode( $body, true );
+			$all_ads = $data;
+		}
+
+		return $all_ads;
 	}
 
 	/**
@@ -146,7 +165,7 @@ class Appnexus_ACM_Provider_Front_End {
 					case 'dx':
 						// 'delivery.uat.247realmedia.com'; //Define OAS URL
 						// delivery.oasc17.247realmedia.com
-						$output_html = '';
+						/*$output_html = '';
 						$output_html .= "
 						<script>
 						  var oas_tag = oas_tag || {};
@@ -167,7 +186,7 @@ class Appnexus_ACM_Provider_Front_End {
 				              oas.src = oas_tag.url + '/om/' + oas_tag.version + '.js';
 				              node.parentNode.insertBefore(oas, node);
 						})();
-						</script>";
+						</script>";*/
 						break;
 					default:
 						break;
@@ -494,7 +513,16 @@ class Appnexus_ACM_Provider_Front_End {
 					}
 					break;
 				case 'dx':
-					$output_html = '<div id="oas_' . $tag_id . '"></div><script>oas_tag.loadAd("' . $tag_id . '");</script>';
+					$output_html = '';
+					if ( ! empty( $this->all_ads['Ad'] ) ) {
+						$positions = array_column( $this->all_ads['Ad'], 'Pos' );
+						$key = array_search( $tag_id, $positions );
+						$output_html = $this->all_ads['Ad'][ $key ]['Text'];
+						if ( array_key_exists( 'easy_lazy_loader_html', $GLOBALS['wp_filter'] ) ) {
+							// lazy load
+							$output_html = apply_filters( 'easy_lazy_loader_html', $output_html );
+						}
+					}
 					break;
 				default:
 					break;
