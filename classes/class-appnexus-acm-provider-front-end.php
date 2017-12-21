@@ -520,6 +520,7 @@ class Appnexus_ACM_Provider_Front_End {
 						$output_html = $this->all_ads['Ad'][ $key ]['Text'];
 						// add the impression tracker
 						$output_html .= '<img class="appnexus-ad-impression" src="' . $this->all_ads['Ad'][ $key ]['ImpUrl'] . '" style="position: absolute; visibility: hidden;">';
+						// check for the existence of "easy_lazy_loader_html" filter
 						if ( array_key_exists( 'easy_lazy_loader_html', $GLOBALS['wp_filter'] ) ) {
 							// lazy load
 							$output_html = apply_filters( 'easy_lazy_loader_html', $output_html );
