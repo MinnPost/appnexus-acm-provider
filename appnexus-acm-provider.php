@@ -32,6 +32,7 @@ class Appnexus_ACM_Provider extends ACM_Provider {
 
 		// ACM Ad Panel
 		$this->ad_panel = $this->ad_panel();
+		add_filter( 'acm_register_provider_slug', array( $this, 'acm_register_provider_slug' ) );
 
 		// tags for AppNexus
 		$this->ad_tag_ids = $this->ad_panel->ad_tag_ids();
@@ -59,6 +60,15 @@ class Appnexus_ACM_Provider extends ACM_Provider {
 		$ad_panel = new Appnexus_ACM_Provider_Ad_Panel( $this->option_prefix, $this->version, $this->slug, $this->ad_code_manager );
 		add_filter( 'acm_ad_code_args', array( $ad_panel, 'filter_ad_code_args' ) );
 		return $ad_panel;
+	}
+
+	public function acm_register_provider_slug( $providers ) {
+		error_log( 'what' );
+		$providers->appnexus = array(
+			'provider' => 'Appnexus_ACM_Provider',
+			'table' => 'Appnexus_ACM_WP_List_Table',
+		);
+		return $providers;
 	}
 
 	/**
