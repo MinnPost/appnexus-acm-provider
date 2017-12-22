@@ -289,6 +289,20 @@ class Appnexus_ACM_Provider_Admin {
 			),
 		);
 
+		if ( class_exists( 'EasyLazyLoader' ) ) {
+			$settings['lazy_load_ads'] = array(
+				'title' => __( 'Lazy Load Ads?', 'appnexus-acm-provider' ),
+				'callback' => $callbacks['text'],
+				'page' => $page,
+				'section' => $section,
+				'args' => array(
+					'type' => 'checkbox',
+					'desc' => 'Load each ad when the user scrolls near it',
+					'default' => '0',
+				),
+			);
+		}
+
 		foreach ( $settings as $key => $attributes ) {
 			$id = $this->option_prefix . $key;
 			$name = $this->option_prefix . $key;

@@ -62,6 +62,8 @@ class Appnexus_ACM_Provider_Front_End {
 
 		$this->tag_type = get_option( $this->option_prefix . 'ad_tag_type', '' );
 
+		$this->lazy_load = get_option( $this->option_prefix . 'lazy_load_ads', '0' );
+
 		$this->all_ads = $this->store_ad_response();
 
 		$this->add_actions();
@@ -506,8 +508,8 @@ class Appnexus_ACM_Provider_Front_End {
 				case 'sx':
 					$not_tags = implode( ',', array_column( $ad_tags, 'tag' ) );
 					$output_html = '<iframe src="' . $this->default_url . 'adstream_sx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $not_tags . '!' . $tag_id . '?_RM_IP_=' . $_SERVER['REMOTE_ADDR'] . '" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>';
-					// check for the existence of "easy_lazy_loader_html" filter
-					if ( array_key_exists( 'easy_lazy_loader_html', $GLOBALS['wp_filter'] ) ) {
+					// check for the lazy load option and existence of "easy_lazy_loader_html" filter
+					if ( '1' === $this->lazy_load && array_key_exists( 'easy_lazy_loader_html', $GLOBALS['wp_filter'] ) ) {
 						// lazy load
 						$output_html = apply_filters( 'easy_lazy_loader_html', $output_html );
 					}
@@ -521,8 +523,8 @@ class Appnexus_ACM_Provider_Front_End {
 							$output_html = $this->all_ads['Ad'][ $key ]['Text'];
 							// add the impression tracker
 							$output_html .= '<img class="appnexus-ad-impression" src="' . $this->all_ads['Ad'][ $key ]['ImpUrl'] . '" style="position: absolute; visibility: hidden;">';
-							// check for the existence of "easy_lazy_loader_html" filter
-							if ( array_key_exists( 'easy_lazy_loader_html', $GLOBALS['wp_filter'] ) ) {
+							// check for the lazy load option and existence of "easy_lazy_loader_html" filter
+							if ( '1' === $this->lazy_load && array_key_exists( 'easy_lazy_loader_html', $GLOBALS['wp_filter'] ) ) {
 								// lazy load
 								$output_html = apply_filters( 'easy_lazy_loader_html', $output_html );
 							}
