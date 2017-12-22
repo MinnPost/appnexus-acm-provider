@@ -233,9 +233,12 @@ class Appnexus_ACM_Provider_Front_End {
 	public function insert_and_render_inline_ads( $content = '' ) {
 
 		global $wp_query;
-
-		$post_type = $wp_query->queried_object->post_type;
-		$post_id = $wp_query->queried_object->ID;
+		if ( is_object( $wp_query->queried_object ) ) {
+			$post_type = $wp_query->queried_object->post_type;
+			$post_id = $wp_query->queried_object->ID;
+		} else {
+			return $content;
+		}
 		$in_editor = false; // we are not in the editor right now
 
 		// Should we skip rendering ads?
@@ -527,7 +530,7 @@ class Appnexus_ACM_Provider_Front_End {
 						if ( is_int( $key ) ) {
 							$ad_html = $this->all_ads['Ad'][ $key ]['Text'];
 
-							if ( false !== stripos( $ad_html, '<img' ) ) {
+							if ( false !== stripos( $ad_html, '<img' ) && false === stripos( $ad_html, '<noscript' ) ) {
 								$has_image = true;
 							}
 							if ( false !== stripos( $ad_html, '<iframe' ) ) {
