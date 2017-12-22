@@ -516,18 +516,51 @@ class Appnexus_ACM_Provider_Front_End {
 					break;
 				case 'dx':
 					$output_html = '';
+					$impression_html = '';
+					$has_image = false;
+					$has_iframe = false;
+					$has_video = false;
+					$has_audio = false;
 					if ( ! empty( $this->all_ads['Ad'] ) ) {
 						$positions = array_column( $this->all_ads['Ad'], 'Pos' );
 						$key = array_search( $tag_id, $positions );
 						if ( is_int( $key ) ) {
-							$output_html = $this->all_ads['Ad'][ $key ]['Text'];
+							$ad_html = $this->all_ads['Ad'][ $key ]['Text'];
+
+							if ( false !== stripos( $ad_html, '<img' ) ) {
+								$has_image = true;
+							}
+							if ( false !== stripos( $ad_html, '<iframe' ) ) {
+								$has_iframe = true;
+							}
+							if ( false !== stripos( $ad_html, '<video' ) ) {
+								$has_video = true;
+							}
+							if ( false !== stripos( $ad_html, '<audio' ) ) {
+								$has_audio = true;
+							}
+
 							// add the impression tracker
-							$output_html .= '<img class="appnexus-ad-impression" src="' . $this->all_ads['Ad'][ $key ]['ImpUrl'] . '" style="position: absolute; visibility: hidden;">';
+							$impression_html = '<img class="appnexus-ad-impression" src="' . $this->all_ads['Ad'][ $key ]['ImpUrl'] . '" style="width: 1px; height: 1px; position: absolute; visibility: hidden;">';
 							// check for the lazy load option and existence of "easy_lazy_loader_html" filter
 							if ( '1' === $this->lazy_load && array_key_exists( 'easy_lazy_loader_html', $GLOBALS['wp_filter'] ) ) {
 								// lazy load
-								$output_html = apply_filters( 'easy_lazy_loader_html', $output_html );
+								$lazy_load_options = get_option( 'easylazyloader_options', array() );
+								if ( true === $has_image && (bool) 1 === $lazy_load_options['lazy_load_images'] ) {
+									$ad_html = apply_filters( 'easy_lazy_loader_html', $ad_html );
+								}
+								if ( true === $has_iframe && (bool) 1 === $lazy_load_options['lazy_load_iframes'] ) {
+									$ad_html = apply_filters( 'easy_lazy_loader_html', $ad_html );
+								}
+								if ( true === $has_video && (bool) 1 === $lazy_load_options['lazy_load_videos'] ) {
+									$ad_html = apply_filters( 'easy_lazy_loader_html', $ad_html );
+								}
+								if ( true === $has_audio && (bool) 1 === $lazy_load_options['lazy_load_audios'] ) {
+									$ad_html = apply_filters( 'easy_lazy_loader_html', $ad_html );
+								}
+								$impression_html = apply_filters( 'easy_lazy_loader_html', $impression_html );
 							}
+							$output_html = $ad_html . $impression_html;
 						}
 					}
 					break;
