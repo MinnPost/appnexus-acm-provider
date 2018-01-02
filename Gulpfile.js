@@ -34,7 +34,8 @@ const paths = {
 	'images': [ 'assets/img/*', '!assets/img/*.svg', 'docs/assets/img/**/*' ],
 	'php': [ './*.php', './**/*.php' ],
 	'sass': 'assets/sass/**/*.scss',
-	'concat_scripts': 'assets/js/src/*.js',
+	'concat_scripts_admin': 'assets/js/src/admin/*.js',
+	'concat_scripts_front_end': 'assets/js/src/front-end/*.js',
 	'scripts': [ 'assets/js/*.js', '!assets/js/*.min.js' ]
 };
 
@@ -193,8 +194,8 @@ gulp.task( 'imagemin', () =>
  * https://github.com/babel/gulp-babel
  * https://www.npmjs.com/package/gulp-sourcemaps
  */
-gulp.task( 'concat', () =>
-	gulp.src( paths.concat_scripts )
+gulp.task('concat', function () {
+	var admin = gulp.src( paths.concat_scripts_admin )
 
 		// Deal with errors.
 		.pipe( plumber(
@@ -217,8 +218,33 @@ gulp.task( 'concat', () =>
 
 		// Save appnexus-acm-provider-admin.js
 		.pipe( gulp.dest( 'assets/js' ) )
-		.pipe( browserSync.stream() )
-);
+		.pipe( browserSync.stream() );
+
+	var front_end = gulp.src( paths.concat_scripts_front_end )
+
+		// Deal with errors.
+		.pipe( plumber(
+			{'errorHandler': handleErrors}
+		) )
+
+		// Start a sourcemap.
+		.pipe( sourcemaps.init() )
+
+		// Convert ES6+ to ES2015.
+		.pipe( babel( {
+			presets: [ 'es2015' ]
+		} ) )
+
+		// Concatenate partials into a single script.
+		.pipe( concat( 'appnexus-acm-provider.js' ) )
+
+		// Append the sourcemap to appnexus-acm-provider.js.
+		.pipe( sourcemaps.write() )
+
+		// Save appnexus-acm-provider.js
+		.pipe( gulp.dest( 'assets/js' ) )
+		.pipe( browserSync.stream() );
+});
 
 /**
   * Minify compiled JavaScript.
