@@ -105,7 +105,13 @@ class Appnexus_ACM_Provider extends ACM_Provider {
 }
 
 class Appnexus_ACM_WP_List_Table extends ACM_WP_List_Table {
-	function __construct() {
+	/**
+	 * Register table settings
+	 *
+	 * @uses parent::__construct
+	 * @return null
+	 */
+	public function __construct() {
 		parent::__construct( array(
 			'singular' => 'appnexus_acm_wp_list_table', //Singular label
 			'plural' => 'appnexus_acm_wp_list_table', //plural label, also this well be one of the table css class
