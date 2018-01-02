@@ -64,6 +64,7 @@ class Appnexus_ACM_Provider_Front_End {
 
 		$this->lazy_load = get_option( $this->option_prefix . 'lazy_load_ads', '0' );
 
+		$this->form_transients = new Appnexus_ACM_Provider_Transient( 'appnexus_acm_transients' );
 		$this->all_ads = $this->store_ad_response();
 
 		$this->add_actions();
@@ -93,17 +94,47 @@ class Appnexus_ACM_Provider_Front_End {
 		$all_ads = array();
 
 		if ( 'dx' === $this->tag_type ) {
-			$dx_url = $this->default_url . 'adstream_dx.ads/json/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . implode( ',', array_column( $this->ad_tag_ids, 'tag' ) );
-			$request = wp_remote_get( $dx_url );
-			if ( is_wp_error( $request ) ) {
-				return $all_ads;
+			$tags_for_url = array_column( $this->ad_tag_ids, 'tag' );
+			$dx_url = $this->default_url . 'adstream_dx.ads/json/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . implode( ',', $tags_for_url );
+			$cached = $this->cache_get( $tags_for_url );
+			if ( is_array( $cached ) ) {
+				$all_ads = $cached;
+			} else {
+				$request = wp_remote_get( $dx_url );
+				if ( is_wp_error( $request ) ) {
+					return $all_ads;
+				}
+				$body = wp_remote_retrieve_body( $request );
+				$all_ads = json_decode( $body, true );
+				$cached = $this->cache_set( $tags_for_url, $all_ads );
 			}
-			$body = wp_remote_retrieve_body( $request );
-			$data = json_decode( $body, true );
-			$all_ads = $data;
 		}
 
 		return $all_ads;
+	}
+
+	/**
+	 * Check to see if this API call exists in the cache
+	 * if it does, return the transient for that key
+	 *
+	 * @param mixed $call The API call we'd like to make.
+	 * @return $this->form_transients->get $cachekey
+	 */
+	private function cache_get( $call ) {
+		$cachekey = md5( wp_json_encode( $call ) );
+		return $this->form_transients->get( $cachekey );
+	}
+
+	/**
+	 * Create a cache entry for the current result, with the url and args as the key
+	 *
+	 * @param mixed $call The API query name.
+	 * @return Bool whether or not the value was set
+	 * @link https://wordpress.stackexchange.com/questions/174330/transient-storage-location-database-xcache-w3total-cache
+	 */
+	private function cache_set( $call, $data ) {
+		$cachekey = md5( wp_json_encode( $call ) );
+		return $this->form_transients->set( $cachekey, $data );
 	}
 
 	/**
@@ -616,6 +647,96 @@ class Appnexus_ACM_Provider_Front_End {
 				# code...
 				break;
 		}
+	}
+
+}
+
+/**
+ * Class to store all theme/plugin transients as an array in one WordPress transient
+ **/
+class Appnexus_ACM_Provider_Transient {
+
+	protected $name;
+
+	public $cache_expiration;
+
+	/**
+	 * Constructor which sets cache options and the name of the field that lists this plugin's cache keys.
+	 *
+	 * @param string $name The name of the field that lists all cache keys.
+	 */
+	public function __construct( $name ) {
+		$this->name = $name;
+		$this->cache_expiration = 600;
+		$this->cache_prefix = esc_sql( 'appnexus_acm_' );
+	}
+
+	/**
+	 * Get the transient that lists all the other transients for this plugin.
+	 *
+	 * @return mixed value of transient. False of empty, otherwise array.
+	 */
+	public function all_keys() {
+		return get_transient( $this->name );
+	}
+
+	/**
+	 * Set individual transient, and add its key to the list of this plugin's transients.
+	 *
+	 * @param string $cachekey the key for this cache item
+	 * @param mixed $value the value of the cache item
+	 * @param int $cache_expiration. How long the plugin key cache, and this individual item cache, should last before expiring.
+	 * @return mixed value of transient. False of empty, otherwise array.
+	 */
+	public function set( $cachekey, $value ) {
+
+		$prefix = $this->cache_prefix;
+		$cachekey = $prefix . $cachekey;
+
+		$keys = $this->all_keys();
+		$keys[] = $cachekey;
+		set_transient( $this->name, $keys, $this->cache_expiration );
+
+		return set_transient( $cachekey, $value, $this->cache_expiration );
+	}
+
+	/**
+	 * Get the individual cache value
+	 *
+	 * @param string $cachekey the key for this cache item
+	 * @return mixed value of transient. False of empty, otherwise array.
+	 */
+	public function get( $cachekey ) {
+		$prefix = $this->cache_prefix;
+		$cachekey = $prefix . $cachekey;
+		return get_transient( $cachekey );
+	}
+
+	/**
+	 * Delete the individual cache value
+	 *
+	 * @param string $cachekey the key for this cache item
+	 * @return bool True if successful, false otherwise.
+	 */
+	public function delete( $cachekey ) {
+		$prefix = $this->cache_prefix;
+		$cachekey = $prefix . $cachekey;
+		return delete_transient( $cachekey );
+	}
+
+	/**
+	 * Delete the entire cache for this plugin
+	 *
+	 * @return bool True if successful, false otherwise.
+	 */
+	public function flush() {
+		$keys = $this->all_keys();
+		$result = true;
+		foreach ( $keys as $key ) {
+			$result = delete_transient( $key );
+		}
+		$result = delete_transient( $this->name );
+		return $result;
 	}
 
 }
