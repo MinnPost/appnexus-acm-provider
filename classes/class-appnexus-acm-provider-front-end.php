@@ -64,8 +64,6 @@ class Appnexus_ACM_Provider_Front_End {
 
 		$this->lazy_load = get_option( $this->option_prefix . 'lazy_load_ads', '0' );
 
-		$this->all_ads = $this->store_ad_response();
-
 		$this->add_actions();
 
 	}
@@ -75,6 +73,7 @@ class Appnexus_ACM_Provider_Front_End {
 	*
 	*/
 	private function add_actions() {
+		add_action( 'wp_enqueue_scripts', array( $this, 'scripts_and_styles' ) );
 		add_filter( 'acm_output_html', array( $this, 'filter_output_html' ), 10, 2 );
 		add_filter( 'acm_display_ad_codes_without_conditionals', array( $this, 'check_conditionals' ) );
 
@@ -89,21 +88,19 @@ class Appnexus_ACM_Provider_Front_End {
 		add_action( 'wp_head', array( $this, 'action_wp_head' ) );
 	}
 
-	private function store_ad_response() {
-		$all_ads = array();
-
-		if ( 'dx' === $this->tag_type ) {
-			$dx_url = $this->default_url . 'adstream_dx.ads/json/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . implode( ',', array_column( $this->ad_tag_ids, 'tag' ) );
-			$request = wp_remote_get( $dx_url );
-			if ( is_wp_error( $request ) ) {
-				return $all_ads;
+	/**
+	* Styles. Load the CSS and/or JavaScript for the plugin's settings
+	*
+	* @return void
+	*/
+	public function scripts_and_styles() {
+		if ( '1' === $this->lazy_load && 'dx' === $this->tag_type ) {
+			if ( ! wp_script_is( 'jquery-sonar', 'enqueued' ) ) {
+				wp_register_script( 'jquery-sonar', plugins_url( '../assets/js/jquery.sonar.min.js', __FILE__ ), array( 'jquery' ), '3.0.0', true );
 			}
-			$body = wp_remote_retrieve_body( $request );
-			$data = json_decode( $body, true );
-			$all_ads = $data;
+			wp_enqueue_script( $this->slug, plugins_url( '../assets/js/' . $this->slug . '.min.js', __FILE__ ), array( 'jquery', 'jquery-sonar' ), $this->version, true );
 		}
-
-		return $all_ads;
+		//wp_enqueue_style( $this->slug, plugins_url( 'assets/css/' . $this->slug . '.min.css', __FILE__ ), array(), $this->version, 'all' );
 	}
 
 	/**
@@ -165,30 +162,52 @@ class Appnexus_ACM_Provider_Front_End {
 					case 'sx':
 						break;
 					case 'dx':
-						// 'delivery.uat.247realmedia.com'; //Define OAS URL
-						// delivery.oasc17.247realmedia.com
-						/*$output_html = '';
-						$output_html .= "
-						<script>
-						  var oas_tag = oas_tag || {};
-						  oas_tag.url = '" . $this->default_url . "';
-						  oas_tag.sizes = function() {
-						  ";
-						foreach ( $tags as $tag ) {
-							$output_html .= 'oas_tag.definePOS("' . $tag . '");' . "\n";
-						}
-						$output_html .= '};' . "\n";
-						$output_html .= 'oas_tag.site_page = "MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '";' . "\n";
-						$output_html .= "(function() {
-							oas_tag.version ='1';oas_tag.loadAd = oas_tag.loadAd || function(){};
+						$output_html = "<script>
+						var oas_tag = oas_tag || {};
+						oas_tag.url = '" . $this->default_domain . "';
+						oas_tag.allowSizeOverride = true;
+						oas_tag.sizes = function () {
+							oas_tag.definePos('Top', [728,90]);
+							oas_tag.definePos('TopRight', [230,90]);
+							oas_tag.definePos('TopLeft', [330,22]);
+							oas_tag.definePos('Right1', [300,600]);
+							oas_tag.definePos('x01', [300,250]);
+							oas_tag.definePos('x02', [300,250]);
+							oas_tag.definePos('x03', [300,250]);
+							oas_tag.definePos('x04', [300,250]);
+							oas_tag.definePos('x05', [300,250]);
+							oas_tag.definePos('x06', [300,250]);
+							oas_tag.definePos('x07', [300,250]);
+							oas_tag.definePos('x08', [300,250]);
+							oas_tag.definePos('x09', [300,250]);
+							oas_tag.definePos('x10', [300,250]);
+							oas_tag.definePos('x100', [300,250]);
+							oas_tag.definePos('x101', [300,250]);
+							oas_tag.definePos('x102', [300,250]);
+							oas_tag.definePos('x103', [300,250]);
+							oas_tag.definePos('x104', [300,250]);
+							oas_tag.definePos('x105', [300,250]);
+							oas_tag.definePos('x106', [300,250]);
+							oas_tag.definePos('x107', [300,250]);
+							oas_tag.definePos('x108', [300,250]);
+							oas_tag.definePos('x109', [300,250]);
+							oas_tag.definePos('x110', [300,250]);
+							oas_tag.definePos('x120', [300,250]);
+							oas_tag.definePos('Middle', [300,250]);
+							oas_tag.definePos('Middle3', [400,150]);
+							oas_tag.definePos('BottomRight', [300,250]);
+						};
+						oas_tag.site_page = 'MP' + window.location.pathname;
+						(function() {
+							oas_tag.version ='1'; oas_tag.loadAd = oas_tag.loadAd || function(){};
 							var oas = document.createElement('script'),
-				              protocol = 'https:' == document.location.protocol?'https://':'http://',
-				              node = document.getElementsByTagName('script')[0];
-				              oas.type = 'text/javascript'; oas.async = true;
-				              oas.src = oas_tag.url + '/om/' + oas_tag.version + '.js';
-				              node.parentNode.insertBefore(oas, node);
+							protocol = 'https:' == document.location.protocol?'https://':'http://',
+							node = document.getElementsByTagName('script')[0];
+							oas.type = 'text/javascript'; oas.async = true;
+							oas.src = protocol + oas_tag.url + '/om/' + oas_tag.version + '.js';
+							node.parentNode.insertBefore(oas, node);
 						})();
-						</script>";*/
+						</script>";
 						break;
 					default:
 						break;
@@ -518,53 +537,11 @@ class Appnexus_ACM_Provider_Front_End {
 					}
 					break;
 				case 'dx':
-					$output_html = '';
-					$impression_html = '';
-					$has_image = false;
-					$has_iframe = false;
-					$has_video = false;
-					$has_audio = false;
-					if ( ! empty( $this->all_ads['Ad'] ) ) {
-						$positions = array_column( $this->all_ads['Ad'], 'Pos' );
-						$key = array_search( $tag_id, $positions );
-						if ( is_int( $key ) ) {
-							$ad_html = $this->all_ads['Ad'][ $key ]['Text'];
-
-							if ( false !== stripos( $ad_html, '<img' ) && false === stripos( $ad_html, '<noscript' ) ) {
-								$has_image = true;
-							}
-							if ( false !== stripos( $ad_html, '<iframe' ) ) {
-								$has_iframe = true;
-							}
-							if ( false !== stripos( $ad_html, '<video' ) ) {
-								$has_video = true;
-							}
-							if ( false !== stripos( $ad_html, '<audio' ) ) {
-								$has_audio = true;
-							}
-
-							// add the impression tracker
-							$impression_html = '<img class="appnexus-ad-impression" src="' . $this->all_ads['Ad'][ $key ]['ImpUrl'] . '" style="width: 1px; height: 1px; position: absolute; visibility: hidden;">';
-							// check for the lazy load option and existence of "easy_lazy_loader_html" filter
-							if ( '1' === $this->lazy_load && array_key_exists( 'easy_lazy_loader_html', $GLOBALS['wp_filter'] ) ) {
-								// lazy load
-								$lazy_load_options = get_option( 'easylazyloader_options', array() );
-								if ( true === $has_image && (bool) 1 === $lazy_load_options['lazy_load_images'] ) {
-									$ad_html = apply_filters( 'easy_lazy_loader_html', $ad_html );
-								}
-								if ( true === $has_iframe && (bool) 1 === $lazy_load_options['lazy_load_iframes'] ) {
-									$ad_html = apply_filters( 'easy_lazy_loader_html', $ad_html );
-								}
-								if ( true === $has_video && (bool) 1 === $lazy_load_options['lazy_load_videos'] ) {
-									$ad_html = apply_filters( 'easy_lazy_loader_html', $ad_html );
-								}
-								if ( true === $has_audio && (bool) 1 === $lazy_load_options['lazy_load_audios'] ) {
-									$ad_html = apply_filters( 'easy_lazy_loader_html', $ad_html );
-								}
-								$impression_html = apply_filters( 'easy_lazy_loader_html', $impression_html );
-							}
-							$output_html = $ad_html . $impression_html;
-						}
+					// check for the lazy load option and existence of jquery sonar script
+					if ( '1' === $this->lazy_load ) {
+						$output_html = '<div class="load-ad" data-oas-tag-id="' . $tag_id . '"></div>';
+					} else {
+						$output_html = '<div id="oas_' . $tag_id . '"></div><script>oas_tag.loadAd("' . $tag_id . '");</script>';
 					}
 					break;
 				default:
@@ -573,16 +550,6 @@ class Appnexus_ACM_Provider_Front_End {
 
 			$output_html = '<div class="appnexus-ad ad-' . sanitize_title( $tag_id ) . '">' . $output_html . '</div>';
 
-			/*if ( 4 === strlen( $tag_id ) && 0 === strpos( $tag_id, 'x10' ) ) {
-				$output_html = '
-					<div class="appnexus-ad ad-' . sanitize_title( $tag_id ) . '">
-						<code><!--
-						OAS_AD("' . $tag_id . '");
-						//-->
-						</code>
-					</div>
-				';
-			}*/
 		}
 		// use the function we already have for the placeholder ad
 		if ( function_exists( 'acm_no_ad_users' ) ) {
