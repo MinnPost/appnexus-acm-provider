@@ -64,8 +64,10 @@ class Appnexus_ACM_Provider_Front_End {
 
 		$this->lazy_load = get_option( $this->option_prefix . 'lazy_load_ads', '0' );
 
-		$this->form_transients = new Appnexus_ACM_Provider_Transient( 'appnexus_acm_transients' );
-		$this->all_ads = $this->store_ad_response();
+		$this->cache = false;
+		if ( true === $this->cache ) {
+			$this->form_transients = new Appnexus_ACM_Provider_Transient( 'appnexus_acm_transients' );
+		}
 
 		$this->add_actions();
 
@@ -75,7 +77,8 @@ class Appnexus_ACM_Provider_Front_End {
 	* Create the action hooks to filter the html, render the ads, and the shortcodes
 	*
 	*/
-	private function add_actions() {
+	public function add_actions() {
+		add_action( 'wp_loaded', array( $this, 'store_ad_response' ) );
 		add_filter( 'acm_output_html', array( $this, 'filter_output_html' ), 10, 2 );
 		add_filter( 'acm_display_ad_codes_without_conditionals', array( $this, 'check_conditionals' ) );
 
@@ -90,29 +93,33 @@ class Appnexus_ACM_Provider_Front_End {
 		add_action( 'wp_head', array( $this, 'action_wp_head' ) );
 	}
 
-	private function store_ad_response() {
+	public function store_ad_response() {
 		$all_ads = array();
 
 		if ( 'dx' === $this->tag_type ) {
-			// store items for the cache key, including the user agent.
-			// we store the user agent because that seems to be how appnexus handles mobile ads
-			$tags_for_url = array_column( $this->ad_tag_ids, 'tag' );
+			// we use the user agent because that seems to be how appnexus handles mobile ads
+			$current_url = strtok( $_SERVER['REQUEST_URI'], '?' );
+			$tag_list = array_column( $this->ad_tag_ids, 'tag' );
+
+			$dx_url = $this->default_url . 'adstream_dx.ads/json/MP' . $current_url . '1' . $this->random_number . '@' . implode( ',', $tag_list );
 			$user_agent = $_SERVER['HTTP_USER_AGENT'];
 
-			// check the cache for: site url, tags, user agent combination
-			$cached = $this->cache_get(
-				array(
-					'site-url' => $_SERVER['REQUEST_URI'],
-					'tags' => $tags_for_url,
-					'user-agent' => $user_agent,
-				)
-			);
-			if ( is_array( $cached ) ) {
+			if ( true === $this->cache ) {
+				// check the cache for url/user agent combination
+				$cached = $this->cache_get(
+					array(
+						'url' => $current_url,
+						'tag-list' => $tag_list,
+						'user-agent' => $user_agent,
+					)
+				);
+			}
+
+			if ( isset( $cached ) && is_array( $cached ) ) {
+				// load data from cache if it is available
 				$all_ads = $cached;
 			} else {
-
 				// call the ad server to get the json response
-				$dx_url = $this->default_url . 'adstream_dx.ads/json/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . implode( ',', $tags_for_url );
 				$request_args = array(
 					'user-agent'  => $user_agent,
 				);
@@ -123,18 +130,20 @@ class Appnexus_ACM_Provider_Front_End {
 				$body = wp_remote_retrieve_body( $request );
 				$all_ads = json_decode( $body, true );
 
-				// cache the json response
-				$cached = $this->cache_set(
-					array(
-						'site-url' => $_SERVER['REQUEST_URI'],
-						'tags' => $tags_for_url,
-						'user-agent' => $user_agent,
-					),
-					$all_ads
-				);
+				if ( true === $this->cache ) {
+					// cache the json response
+					$cached = $this->cache_set(
+						array(
+							'url' => $current_url,
+							'tag-list' => $tag_list,
+							'user-agent' => $user_agent,
+						),
+						$all_ads
+					);
+				}
 			}
 		}
-
+		$this->all_ads = $all_ads;
 		return $all_ads;
 	}
 
