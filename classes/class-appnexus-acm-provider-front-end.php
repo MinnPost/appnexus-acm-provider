@@ -94,19 +94,44 @@ class Appnexus_ACM_Provider_Front_End {
 		$all_ads = array();
 
 		if ( 'dx' === $this->tag_type ) {
+			// store items for the cache key, including the user agent.
+			// we store the user agent because that seems to be how appnexus handles mobile ads
 			$tags_for_url = array_column( $this->ad_tag_ids, 'tag' );
-			$dx_url = $this->default_url . 'adstream_dx.ads/json/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . implode( ',', $tags_for_url );
-			$cached = $this->cache_get( $tags_for_url );
+			$user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+			// check the cache for: site url, tags, user agent combination
+			$cached = $this->cache_get(
+				array(
+					'site-url' => $_SERVER['REQUEST_URI'],
+					'tags' => $tags_for_url,
+					'user-agent' => $user_agent,
+				)
+			);
 			if ( is_array( $cached ) ) {
 				$all_ads = $cached;
 			} else {
-				$request = wp_remote_get( $dx_url );
+
+				// call the ad server to get the json response
+				$dx_url = $this->default_url . 'adstream_dx.ads/json/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . implode( ',', $tags_for_url );
+				$request_args = array(
+					'user-agent'  => $user_agent,
+				);
+				$request = wp_remote_get( $dx_url, $request_args );
 				if ( is_wp_error( $request ) ) {
 					return $all_ads;
 				}
 				$body = wp_remote_retrieve_body( $request );
 				$all_ads = json_decode( $body, true );
-				$cached = $this->cache_set( $tags_for_url, $all_ads );
+
+				// cache the json response
+				$cached = $this->cache_set(
+					array(
+						'site-url' => $_SERVER['REQUEST_URI'],
+						'tags' => $tags_for_url,
+						'user-agent' => $user_agent,
+					),
+					$all_ads
+				);
 			}
 		}
 
