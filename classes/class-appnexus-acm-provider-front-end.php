@@ -299,8 +299,8 @@ class Appnexus_ACM_Provider_Front_End {
 
 		global $wp_query;
 		if ( is_object( $wp_query->queried_object ) ) {
-			$post_type = $wp_query->queried_object->post_type;
-			$post_id = $wp_query->queried_object->ID;
+			$post_type = isset( $wp_query->queried_object->post_type ) ? isset( $wp_query->queried_object->post_type ) : '';
+			$post_id = isset( $wp_query->queried_object->ID ) ? $wp_query->queried_object->ID : '';
 		} else {
 			return $content;
 		}
