@@ -11,6 +11,10 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: appnexus-acm-provider
 */
 
+if ( ! class_exists( 'Ad_Code_Manager' ) ) {
+	die();
+}
+
 class Appnexus_ACM_Provider extends ACM_Provider {
 
 	private $option_prefix;
