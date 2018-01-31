@@ -199,13 +199,13 @@ class Appnexus_ACM_Provider_Admin {
 
 		$settings = array(
 			'default_domain' => array(
-				'title' => __( 'Default Domain', 'appnexus-acm-provider' ),
+				'title' => __( 'Default domain', 'appnexus-acm-provider' ),
 				'callback' => $callbacks['text'],
 				'page' => $page,
 				'section' => $section,
 				'args' => array(
 					'type' => 'text',
-					'desc' => __( 'The ad server domain', 'appnexus-acm-provider' ),
+					'desc' => __( 'Enter the ad server domain.', 'appnexus-acm-provider' ),
 				),
 			),
 			'use_https' => array(
@@ -215,12 +215,12 @@ class Appnexus_ACM_Provider_Admin {
 				'section' => $section,
 				'args' => array(
 					'type' => 'checkbox',
-					'desc' => 'Whether to use HTTPS on the domain',
+					'desc' => 'Choose whether to use HTTPS on the domain.',
 					'default' => '1',
 				),
 			),
 			'server_path' => array(
-				'title' => __( 'Server Path', 'appnexus-acm-provider' ),
+				'title' => __( 'Server path', 'appnexus-acm-provider' ),
 				'callback' => $callbacks['text'],
 				'page' => $page,
 				'section' => $section,
@@ -267,7 +267,7 @@ class Appnexus_ACM_Provider_Admin {
 				'page' => $page,
 				'section' => $section,
 				'args' => array(
-					'desc' => 'Comma separated list of tags',
+					'desc' => 'Enter comma separated list of tags.',
 				),
 			),
 			'show_ads_without_conditionals' => array(
@@ -277,7 +277,7 @@ class Appnexus_ACM_Provider_Admin {
 				'section' => $section,
 				'args' => array(
 					'type' => 'checkbox',
-					'desc' => 'If an ad has no conditionals, show it everywhere',
+					'desc' => 'If an ad has no conditionals, show it everywhere.',
 					'default' => '1',
 				),
 			),
@@ -285,13 +285,13 @@ class Appnexus_ACM_Provider_Admin {
 
 		if ( class_exists( 'EasyLazyLoader' ) ) {
 			$settings['lazy_load_ads'] = array(
-				'title' => __( 'Lazy Load Ads?', 'appnexus-acm-provider' ),
+				'title' => __( 'Lazy load all ads?', 'appnexus-acm-provider' ),
 				'callback' => $callbacks['text'],
 				'page' => $page,
 				'section' => $section,
 				'args' => array(
 					'type' => 'checkbox',
-					'desc' => 'Load each ad when the user scrolls near it',
+					'desc' => 'Load each ad when the user scrolls near it, regardless of its placement. You can also choose to lazy load only embed ads.',
 					'default' => '0',
 				),
 			);
@@ -395,6 +395,19 @@ class Appnexus_ACM_Provider_Admin {
 						),
 					),
 				);
+				if ( class_exists( 'EasyLazyLoader' ) ) {
+					$embed_settings['lazy_load_embeds'] = array(
+						'title' => __( 'Lazy load embed ads?', 'appnexus-acm-provider' ),
+						'callback' => $callbacks['text'],
+						'page' => $page,
+						'section' => $section,
+						'args' => array(
+							'type' => 'checkbox',
+							'desc' => 'If checked, the ad inserter will lazy load embed ads, even if it is not set to lazy load all the other ads.',
+							'default' => '',
+						),
+					);
+				}
 			} elseif ( 'multiple_off' === $key ) {
 				$embed_settings = array(
 					'auto_embed_position' => array(
@@ -429,12 +442,28 @@ class Appnexus_ACM_Provider_Admin {
 					),
 				);
 			} else {
-				/*
-				$scaip_period = get_option( 'scaip_settings_period', 4 );
-				$scaip_repetitions = get_option( 'scaip_settings_repetitions', 10 );
-				$scaip_minimum_paragraphs = get_option( 'scaip_settings_min_paragraphs', 6 );
-				*/
 				$embed_settings = array(
+					'embed_prefix' => array(
+						'title' => __( 'Embed tag prefix', 'appnexus-acm-provider' ),
+						'callback' => $callbacks['text'],
+						'page' => $page,
+						'section' => $section,
+						'args' => array(
+							'type' => 'text',
+							'desc' => 'Embed tags start with this character.',
+						),
+					),
+					'start_tag_id' => array(
+						'title' => __( 'First embed tag ID', 'appnexus-acm-provider' ),
+						'callback' => $callbacks['select'],
+						'page' => $page,
+						'section' => $section,
+						'args' => array(
+							'type' => 'select',
+							'desc' => 'Pick the tag ID that starts the embed tags. The ad inserter will start here, and continue to the maximum number of embeds.',
+							'items' => $this->embed_tag_options(),
+						),
+					),
 					'insert_every_paragraphs' => array(
 						'title' => __( 'Number of paragraphs between each insertion', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['text'],
@@ -446,15 +475,15 @@ class Appnexus_ACM_Provider_Admin {
 							'desc' => __( 'The ad inserter will wait this number of paragraphs after the start of the article, insert the first ad zone, count this many more paragraphs, insert the second ad zone, and so on.', 'appnexus-acm-provider' ),
 						),
 					),
-					'maximum_embed_count' => array(
-						'title' => __( 'Maximum number of embeds', 'appnexus-acm-provider' ),
-						'callback' => $callbacks['text'],
+					'end_tag_id' => array(
+						'title' => __( 'Last embed tag ID', 'appnexus-acm-provider' ),
+						'callback' => $callbacks['select'],
 						'page' => $page,
 						'section' => $section,
 						'args' => array(
-							'type' => 'text',
-							'default' => '10',
-							'desc' => __( 'The absolute maximum number of embed ads that could display in any post. How many actually display depends on how long the post is, and how often an ad should be displayed. You can safely give this a high number.', 'appnexus-acm-provider' ),
+							'type' => 'select',
+							'desc' => 'Starting with ' . get_option( $this->option_prefix . 'start_tag_id', 'the first tag ID' ) . ', pick the last tag ID that could display as an embed ad. How many actually display depends on how long the post is, and how often an ad should be displayed. You can safely pick the highest applicable number.',
+							'items' => $this->embed_tag_options(),
 						),
 					),
 					'minimum_paragraph_count' => array(
@@ -493,6 +522,35 @@ class Appnexus_ACM_Provider_Admin {
 		$settings[ $key ] = $embed_settings;
 	}
 
+	/**
+	* Get list of possible embed tags
+	*
+	* @return array $items
+	*/
+	private function embed_tag_options() {
+		$items = array();
+		$list = explode( ', ', get_option( $this->option_prefix . 'tag_list', '' ) );
+		$embed_prefix = get_option( $this->option_prefix . 'embed_prefix', '' );
+		foreach ( $list as $tag ) {
+			if ( strpos( $tag, $embed_prefix ) === 0 ) {
+				$item = array(
+					'text' => $tag,
+					'value' => $tag,
+					'id' => $tag,
+					'desc' => '',
+					'default' => '',
+				);
+				$items[] = $item;
+			}
+		}
+		return $items;
+	}
+
+	/**
+	* Get list of post types
+	*
+	* @return array $items
+	*/
 	private function post_type_options() {
 		$types = get_post_types();
 		$items = array();

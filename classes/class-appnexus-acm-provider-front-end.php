@@ -62,7 +62,8 @@ class Appnexus_ACM_Provider_Front_End {
 
 		$this->tag_type = get_option( $this->option_prefix . 'ad_tag_type', '' );
 
-		$this->lazy_load = get_option( $this->option_prefix . 'lazy_load_ads', '0' );
+		$this->lazy_load_all = get_option( $this->option_prefix . 'lazy_load_ads', '0' );
+		$this->lazy_load_embeds = get_option( $this->option_prefix . 'lazy_load_embeds', '0' );
 
 		$this->cache = false;
 		if ( true === $this->cache ) {
@@ -434,8 +435,13 @@ class Appnexus_ACM_Provider_Front_End {
 		if ( '1' === $multiple_embeds ) {
 
 			$insert_every_paragraphs = get_option( $this->option_prefix . 'insert_every_paragraphs', 4 );
-			$maximum_embed_count = get_option( $this->option_prefix . 'maximum_embed_count', 10 );
 			$minimum_paragraph_count = get_option( $this->option_prefix . 'minimum_paragraph_count', 6 );
+
+			$embed_prefix = get_option( $this->option_prefix . 'embed_prefix', 'x' );
+			$start_embed_id = get_option( $this->option_prefix . 'start_tag_id', 'x100' );
+			$start_embed_count = intval( str_replace( $embed_prefix, '', $start_embed_id ) ); // ex 100
+			$end_embed_id = get_option( $this->option_prefix . 'end_embed_id', 'x110' );
+			$end_embed_count = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
 
 			$paragraph_positions = array();
 			$last_position = -1;
@@ -448,23 +454,22 @@ class Appnexus_ACM_Provider_Front_End {
 			}
 
 			// If the total number of paragraphs is bigger than the minimum number of paragraphs
-			// It is assumed that $minimum_paragraph_count > $insert_every_paragraphs * $maximum_embed_count
 			if ( count( $paragraph_positions ) >= $minimum_paragraph_count ) {
 				// How many shortcodes have been added?
-				$n = 0;
+				$n = $start_embed_count;
 				// Safety check number: stores the position of the last insertion.
-				$previous_position = 0;
+				$previous_position = $start_embed_count;
 				$i = 0;
-				while ( $i < count( $paragraph_positions ) && $n <= $maximum_embed_count ) {
+				while ( $i < count( $paragraph_positions ) && $n <= $end_embed_count ) {
 					// Modulo math to only output shortcode after $insert_every_paragraphs closing paragraph tags.
 					// +1 because of zero-based indexing.
 					if ( 0 === ( $i + 1 ) % $insert_every_paragraphs && isset( $paragraph_positions[ $i ] ) ) {
 						// make a shortcode using the number of the shorcode that will be added.
 						// Using "" here so we can interpolate the variable.
 						if ( false === $in_editor ) {
-							$shortcode = $this->get_code_to_insert( 'x' . ( 100 + (int) $n ) );
+							$shortcode = $this->get_code_to_insert( $embed_prefix . (int) $n );
 						} elseif ( true === $in_editor ) {
-							$shortcode = '[cms_ad:' . 'x' . ( 100 + (int) $n ) . ']';
+							$shortcode = '[cms_ad:' . $embed_prefix . (int) $n . ']';
 						}
 						$position = $paragraph_positions[ $i ] + 1;
 						// Safety check:
@@ -576,58 +581,24 @@ class Appnexus_ACM_Provider_Front_End {
 				case 'sx':
 					$not_tags = implode( ',', array_column( $ad_tags, 'tag' ) );
 					$output_html = '<iframe src="' . $this->default_url . 'adstream_sx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $not_tags . '!' . $tag_id . '?_RM_IP_=' . $_SERVER['REMOTE_ADDR'] . '" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>';
-					// check for the lazy load option and existence of "easy_lazy_loader_html" filter
-					if ( '1' === $this->lazy_load && array_key_exists( 'easy_lazy_loader_html', $GLOBALS['wp_filter'] ) ) {
-						// lazy load
-						$output_html = apply_filters( 'easy_lazy_loader_html', $output_html );
-					}
+					$output_html = $this->lazy_loaded_html_or_not( $output_html, $tag_id );
 					break;
 				case 'dx':
 					$output_html = '';
 					$impression_html = '';
-					$has_image = false;
-					$has_iframe = false;
-					$has_video = false;
-					$has_audio = false;
+
 					if ( ! empty( $this->all_ads['Ad'] ) ) {
 						$positions = array_column( $this->all_ads['Ad'], 'Pos' );
 						$key = array_search( $tag_id, $positions );
 						if ( is_int( $key ) ) {
 							$ad_html = $this->all_ads['Ad'][ $key ]['Text'];
 
-							if ( false !== stripos( $ad_html, '<img' ) && false === stripos( $ad_html, '<noscript' ) ) {
-								$has_image = true;
-							}
-							if ( false !== stripos( $ad_html, '<iframe' ) ) {
-								$has_iframe = true;
-							}
-							if ( false !== stripos( $ad_html, '<video' ) ) {
-								$has_video = true;
-							}
-							if ( false !== stripos( $ad_html, '<audio' ) ) {
-								$has_audio = true;
-							}
-
 							// add the impression tracker
 							$impression_html = '<img class="appnexus-ad-impression" src="' . $this->all_ads['Ad'][ $key ]['ImpUrl'] . '" style="width: 1px; height: 1px; position: absolute; visibility: hidden;">';
-							// check for the lazy load option and existence of "easy_lazy_loader_html" filter
-							if ( '1' === $this->lazy_load && array_key_exists( 'easy_lazy_loader_html', $GLOBALS['wp_filter'] ) ) {
-								// lazy load
-								$lazy_load_options = get_option( 'easylazyloader_options', array() );
-								if ( true === $has_image && (bool) 1 === $lazy_load_options['lazy_load_images'] ) {
-									$ad_html = apply_filters( 'easy_lazy_loader_html', $ad_html );
-								}
-								if ( true === $has_iframe && (bool) 1 === $lazy_load_options['lazy_load_iframes'] ) {
-									$ad_html = apply_filters( 'easy_lazy_loader_html', $ad_html );
-								}
-								if ( true === $has_video && (bool) 1 === $lazy_load_options['lazy_load_videos'] ) {
-									$ad_html = apply_filters( 'easy_lazy_loader_html', $ad_html );
-								}
-								if ( true === $has_audio && (bool) 1 === $lazy_load_options['lazy_load_audios'] ) {
-									$ad_html = apply_filters( 'easy_lazy_loader_html', $ad_html );
-								}
-								$impression_html = apply_filters( 'easy_lazy_loader_html', $impression_html );
-							}
+
+							$ad_html = $this->lazy_loaded_html_or_not( $ad_html, $tag_id, true );
+							$impression_html = $this->lazy_loaded_html_or_not( $impression_html, $tag_id );
+
 							$output_html = $ad_html . $impression_html;
 						}
 					}
@@ -656,6 +627,100 @@ class Appnexus_ACM_Provider_Front_End {
 			}
 			$output_html = acm_no_ad_users( $output_html, $tag_id );
 		}
+		return $output_html;
+	}
+
+	/**
+	 * Return HTML, lazy loaded or not, depending on settings and such
+	 *
+	 * @param string $output_html    The non lazy loaded html
+	 * @param string $tag_id         The ad tag id
+	 * @param bool $check_html       Whether to check the html contents before trying to lazy load them
+	 *
+	 * @return $output_html          The ad html, lazy loaded if applicable
+	 *
+	 */
+	private function lazy_loaded_html_or_not( $output_html, $tag_id, $check_html = false ) {
+
+		// check for easy lazy load filter
+		if ( array_key_exists( 'easy_lazy_loader_html', $GLOBALS['wp_filter'] ) ) {
+
+			$use_filter = true;
+
+			if ( true === $check_html ) {
+				$use_filter = false; // if we have to check the html, don't use the filter unless it matches
+				$has_image = false;
+				$has_iframe = false;
+				$has_video = false;
+				$has_audio = false;
+
+				if ( false !== stripos( $output_html, '<img' ) && false === stripos( $output_html, '<noscript' ) ) {
+					$has_image = true;
+				}
+				if ( false !== stripos( $output_html, '<iframe' ) ) {
+					$has_iframe = true;
+				}
+				if ( false !== stripos( $output_html, '<video' ) ) {
+					$has_video = true;
+				}
+				if ( false !== stripos( $output_html, '<audio' ) ) {
+					$has_audio = true;
+				}
+
+				// maybe lazy load
+				$lazy_load_options = get_option( 'easylazyloader_options', array() );
+				if ( true === $has_image && (bool) 1 === $lazy_load_options['lazy_load_images'] ) {
+					$use_filter = true;
+				}
+				if ( true === $has_iframe && (bool) 1 === $lazy_load_options['lazy_load_iframes'] ) {
+					$use_filter = true;
+				}
+				if ( true === $has_video && (bool) 1 === $lazy_load_options['lazy_load_videos'] ) {
+					$use_filter = true;
+				}
+				if ( true === $has_audio && (bool) 1 === $lazy_load_options['lazy_load_audios'] ) {
+					$use_filter = true;
+				}
+			}
+
+			if ( false === $use_filter ) {
+				return $output_html;
+			}
+
+			// lazy load everything
+			if ( '1' === $this->lazy_load_all ) {
+				$use_filter = true;
+			} elseif ( '1' === $this->lazy_load_embeds ) {
+				$use_filter = false; // we only want to lazy load the embeds, so set it to true when necessary
+				// lazy load embeds only
+				$multiple_embeds = get_option( $this->option_prefix . 'multiple_embeds', '0' );
+				if ( is_array( $multiple_embeds ) ) {
+					$multiple_embeds = $multiple_embeds[0];
+				}
+
+				// if multiples are enabled, check to see if the id is in the embed tag range
+				if ( '1' === $multiple_embeds ) {
+					$embed_prefix = get_option( $this->option_prefix . 'embed_prefix', 'x' );
+					$start_embed_id = get_option( $this->option_prefix . 'start_tag_id', 'x100' );
+					$start_embed_count = intval( str_replace( $embed_prefix, '', $start_embed_id ) ); // ex 100
+					$end_embed_id = get_option( $this->option_prefix . 'end_embed_id', 'x110' );
+					$end_embed_count = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
+					$current_embed_count = intval( str_replace( $embed_prefix, '', $tag_id ) ); // ex 108
+					if ( ( $current_embed_count > $start_embed_count && $current_embed_count < $end_embed_count ) ) {
+						$use_filter = true;
+					}
+				} else {
+					$auto_embed = get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
+					if ( $auto_embed === $tag_id ) {
+						$use_filter = true;
+					}
+				}
+			}
+			if ( true === $use_filter ) {
+				$output_html = apply_filters( 'easy_lazy_loader_html', $output_html );
+			}
+		}
+
 		return $output_html;
 	}
 
