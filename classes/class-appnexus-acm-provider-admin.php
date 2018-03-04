@@ -530,6 +530,7 @@ class Appnexus_ACM_Provider_Admin {
 	private function embed_tag_options() {
 		$items = array();
 		$list = explode( ', ', get_option( $this->option_prefix . 'tag_list', '' ) );
+		$list = array_map( 'trim', $list );
 		$embed_prefix = get_option( $this->option_prefix . 'embed_prefix', '' );
 		if ( '' !== $embed_prefix ) {
 			foreach ( $list as $tag ) {
