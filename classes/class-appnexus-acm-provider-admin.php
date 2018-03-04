@@ -531,16 +531,18 @@ class Appnexus_ACM_Provider_Admin {
 		$items = array();
 		$list = explode( ', ', get_option( $this->option_prefix . 'tag_list', '' ) );
 		$embed_prefix = get_option( $this->option_prefix . 'embed_prefix', '' );
-		foreach ( $list as $tag ) {
-			if ( strpos( $tag, $embed_prefix ) === 0 ) {
-				$item = array(
-					'text' => $tag,
-					'value' => $tag,
-					'id' => $tag,
-					'desc' => '',
-					'default' => '',
-				);
-				$items[] = $item;
+		if ( '' !== $embed_prefix ) {
+			foreach ( $list as $tag ) {
+				if ( strpos( $tag, $embed_prefix ) === 0 ) {
+					$item = array(
+						'text' => $tag,
+						'value' => $tag,
+						'id' => $tag,
+						'desc' => '',
+						'default' => '',
+					);
+					$items[] = $item;
+				}
 			}
 		}
 		return $items;
