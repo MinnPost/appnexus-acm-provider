@@ -124,7 +124,7 @@ msgstr ""
 msgid "This setting allows you to prevent ads from appearing on posts with fewer paragraphs than the threshold."
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:616, classes/class-appnexus-acm-provider-admin.php:654, classes/class-appnexus-acm-provider-admin.php:802
+#: classes/class-appnexus-acm-provider-admin.php:619, classes/class-appnexus-acm-provider-admin.php:657, classes/class-appnexus-acm-provider-admin.php:805
 msgid "Defined in wp-config.php"
 msgstr ""
 
