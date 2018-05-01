@@ -28,8 +28,8 @@ class Appnexus_ACM_Provider extends ACM_Provider {
 	public function __construct() {
 
 		$this->option_prefix = 'appnexus_acm_provider_';
-		$this->version = '0.0.4';
-		$this->slug = 'appnexus-acm-provider';
+		$this->version       = '0.0.4';
+		$this->slug          = 'appnexus-acm-provider';
 
 		global $ad_code_manager;
 		$this->ad_code_manager = $ad_code_manager;
@@ -118,8 +118,8 @@ class Appnexus_ACM_WP_List_Table extends ACM_WP_List_Table {
 	public function __construct() {
 		parent::__construct( array(
 			'singular' => 'appnexus_acm_wp_list_table', //Singular label
-			'plural' => 'appnexus_acm_wp_list_table', //plural label, also this well be one of the table css class
-			'ajax' => true,
+			'plural'   => 'appnexus_acm_wp_list_table', //plural label, also this well be one of the table css class
+			'ajax'     => true,
 		) );
 	}
 
@@ -128,14 +128,14 @@ class Appnexus_ACM_WP_List_Table extends ACM_WP_List_Table {
 	 */
 	function filter_columns() {
 		return array(
-			'cb'             => '<input type="checkbox" />',
-			'id'             => __( 'ID', 'ad-code-manager' ),
-			'tag'            => __( 'Tag', 'ad-code-manager' ),
-			'tag_id'         => __( 'Tag ID', 'ad-code-manager' ),
-			'tag_name'       => __( 'Tag Name', 'ad-code-manager' ),
-			'priority'       => __( 'Priority', 'ad-code-manager' ),
-			'operator'       => __( 'Logical Operator', 'ad-code-manager' ),
-			'conditionals'   => __( 'Conditionals', 'ad-code-manager' ),
+			'cb'           => '<input type="checkbox" />',
+			'id'           => __( 'ID', 'ad-code-manager' ),
+			'tag'          => __( 'Tag', 'ad-code-manager' ),
+			'tag_id'       => __( 'Tag ID', 'ad-code-manager' ),
+			'tag_name'     => __( 'Tag Name', 'ad-code-manager' ),
+			'priority'     => __( 'Priority', 'ad-code-manager' ),
+			'operator'     => __( 'Logical Operator', 'ad-code-manager' ),
+			'conditionals' => __( 'Conditionals', 'ad-code-manager' ),
 		);
 	}
 
@@ -151,7 +151,7 @@ class Appnexus_ACM_WP_List_Table extends ACM_WP_List_Table {
 	 * Output the tag cell in the list table
 	 */
 	function column_tag( $item ) {
-		$output = isset( $item['tag'] ) ? esc_html( $item['tag'] ) : esc_html( $item['url_vars']['tag'] );
+		$output  = isset( $item['tag'] ) ? esc_html( $item['tag'] ) : esc_html( $item['url_vars']['tag'] );
 		$output .= $this->row_actions_output( $item );
 		return $output;
 	}
@@ -165,7 +165,7 @@ if ( ! function_exists( 'acm_register_appnexus_slug' ) ) :
 	function acm_register_appnexus_slug( $providers ) {
 		$providers->appnexus = array(
 			'provider' => 'Appnexus_ACM_Provider',
-			'table' => 'Appnexus_ACM_WP_List_Table',
+			'table'    => 'Appnexus_ACM_WP_List_Table',
 		);
 		return $providers;
 	}
