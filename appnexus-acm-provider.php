@@ -3,7 +3,7 @@
 Plugin Name: Appnexus ACM Provider
 Plugin URI:
 Description:
-Version: 0.0.4
+Version: 0.0.5
 Author: Jonathan Stegall
 Author URI: https://code.minnpost.com
 License: GPL2+
@@ -28,7 +28,7 @@ class Appnexus_ACM_Provider extends ACM_Provider {
 	public function __construct() {
 
 		$this->option_prefix = 'appnexus_acm_provider_';
-		$this->version       = '0.0.4';
+		$this->version       = '0.0.5';
 		$this->slug          = 'appnexus-acm-provider';
 
 		global $ad_code_manager;

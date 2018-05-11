@@ -1,6 +1,10 @@
 Changelog
 =========
 
+* 0.0.5 (2018-05-11)
+
+	* Add a hook that allows individual posts to skip ads.
+
 * 0.0.4 (2018-02-01)
 
 	* Add the ability to only lazy load embed ads, lazy load all ads, or lazy load no ads.
