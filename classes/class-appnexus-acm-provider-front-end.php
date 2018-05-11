@@ -405,6 +405,12 @@ class Appnexus_ACM_Provider_Front_End {
 			return true;
 		}
 
+		// allow developers to prevent ads
+		$prevent_ads = apply_filters( 'appnexus_acm_provider_prevent_ads', false, $post_id );
+		if ( true === $prevent_ads ) {
+			return true;
+		}
+
 		// If we don't have any paragraphs, let's skip the ads for this post
 		if ( ! stripos( $content, $this->paragraph_end ) ) {
 			return true;
