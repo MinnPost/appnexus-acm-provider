@@ -28,7 +28,7 @@ class Appnexus_ACM_Provider extends ACM_Provider {
 	public function __construct() {
 
 		$this->option_prefix = 'appnexus_acm_provider_';
-		$this->version       = '0.0.5';
+		$this->version       = '0.0.6';
 		$this->slug          = 'appnexus-acm-provider';
 
 		global $ad_code_manager;
