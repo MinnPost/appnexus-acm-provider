@@ -30,9 +30,9 @@ class Appnexus_ACM_Provider_Ad_Panel {
 	*/
 	public function __construct( $option_prefix, $version, $slug, $ad_code_manager ) {
 
-		$this->option_prefix = $option_prefix;
-		$this->version = $version;
-		$this->slug = $slug;
+		$this->option_prefix   = $option_prefix;
+		$this->version         = $version;
+		$this->slug            = $slug;
 		$this->ad_code_manager = $ad_code_manager;
 
 		// Default ad zones for Appnexus
@@ -74,9 +74,9 @@ class Appnexus_ACM_Provider_Ad_Panel {
 		$ad_tag_ids = array();
 		foreach ( $tag_list as $tag ) {
 			$ad_tag_ids[] = array(
-				'tag'       => $tag,
-				'url_vars'  => array(
-					'tag'       => $tag,
+				'tag'               => $tag,
+				'url_vars'          => array(
+					'tag' => $tag,
 				),
 				'enable_ui_mapping' => true,
 			);
@@ -85,8 +85,8 @@ class Appnexus_ACM_Provider_Ad_Panel {
 		$tag_type = get_option( $this->option_prefix . 'ad_tag_type', '' );
 		if ( 'mjx' === $tag_type ) {
 			$ad_tag_ids[] = array(
-				'tag'           => 'appnexus_head',
-				'url_vars'      => array(),
+				'tag'      => 'appnexus_head',
+				'url_vars' => array(),
 			);
 		}
 
@@ -99,26 +99,26 @@ class Appnexus_ACM_Provider_Ad_Panel {
 	public function ad_code_args() {
 		$ad_code_args = array(
 			array(
-				'key'       => 'tag',
-				'label'     => __( 'Tag', 'ad-code-manager' ),
-				'editable'  => true,
-				'required'  => true,
-				'type'      => 'select',
-				'options'   => array(
+				'key'      => 'tag',
+				'label'    => __( 'Tag', 'ad-code-manager' ),
+				'editable' => true,
+				'required' => true,
+				'type'     => 'select',
+				'options'  => array(
 					// This is added later, through 'acm_ad_code_args' filter
 				),
 			),
 			array(
-				'key'       => 'tag_id',
-				'label'     => __( 'Tag ID', 'ad-code-manager' ),
-				'editable'  => true,
-				'required'  => true,
+				'key'      => 'tag_id',
+				'label'    => __( 'Tag ID', 'ad-code-manager' ),
+				'editable' => true,
+				'required' => true,
 			),
 			array(
-				'key'       => 'tag_name',
-				'label'     => __( 'Tag Name', 'ad-code-manager' ),
-				'editable'  => true,
-				'required'  => true,
+				'key'      => 'tag_name',
+				'label'    => __( 'Tag Name', 'ad-code-manager' ),
+				'editable' => true,
+				'required' => true,
 			),
 		);
 		return $ad_code_args;

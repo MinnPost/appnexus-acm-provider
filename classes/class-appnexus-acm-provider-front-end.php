@@ -34,15 +34,15 @@ class Appnexus_ACM_Provider_Front_End {
 	*/
 	public function __construct( $option_prefix, $version, $slug, $ad_code_manager, $ad_panel, $ad_tag_ids ) {
 
-		$this->option_prefix = $option_prefix;
-		$this->version = $version;
-		$this->slug = $slug;
+		$this->option_prefix   = $option_prefix;
+		$this->version         = $version;
+		$this->slug            = $slug;
 		$this->ad_code_manager = $ad_code_manager;
-		$this->ad_panel = $ad_panel;
-		$this->ad_tag_ids = $ad_tag_ids;
+		$this->ad_panel        = $ad_panel;
+		$this->ad_tag_ids      = $ad_tag_ids;
 
 		$this->default_domain = trim( get_option( $this->option_prefix . 'default_domain', '' ) );
-		$this->server_path = trim( get_option( $this->option_prefix . 'server_path', '' ) );
+		$this->server_path    = trim( get_option( $this->option_prefix . 'server_path', '' ) );
 
 		if ( '' !== $this->default_domain && '' !== $this->server_path ) {
 			$use_https = get_option( $this->option_prefix . 'use_https', true );
@@ -62,7 +62,7 @@ class Appnexus_ACM_Provider_Front_End {
 
 		$this->tag_type = get_option( $this->option_prefix . 'ad_tag_type', '' );
 
-		$this->lazy_load_all = get_option( $this->option_prefix . 'lazy_load_ads', '0' );
+		$this->lazy_load_all    = get_option( $this->option_prefix . 'lazy_load_ads', '0' );
 		$this->lazy_load_embeds = get_option( $this->option_prefix . 'lazy_load_embeds', '0' );
 
 		$this->cache = false;
@@ -100,17 +100,17 @@ class Appnexus_ACM_Provider_Front_End {
 		if ( 'dx' === $this->tag_type ) {
 			// we use the user agent because that seems to be how appnexus handles mobile ads
 			$current_url = strtok( $_SERVER['REQUEST_URI'], '?' );
-			$tag_list = array_column( $this->ad_tag_ids, 'tag' );
+			$tag_list    = array_column( $this->ad_tag_ids, 'tag' );
 
-			$dx_url = $this->default_url . 'adstream_dx.ads/json/MP' . $current_url . '1' . $this->random_number . '@' . implode( ',', $tag_list );
+			$dx_url     = $this->default_url . 'adstream_dx.ads/json/MP' . $current_url . '1' . $this->random_number . '@' . implode( ',', $tag_list );
 			$user_agent = $_SERVER['HTTP_USER_AGENT'];
 
 			if ( true === $this->cache ) {
 				// check the cache for url/user agent combination
 				$cached = $this->cache_get(
 					array(
-						'url' => $current_url,
-						'tag-list' => $tag_list,
+						'url'        => $current_url,
+						'tag-list'   => $tag_list,
 						'user-agent' => $user_agent,
 					)
 				);
@@ -122,21 +122,21 @@ class Appnexus_ACM_Provider_Front_End {
 			} else {
 				// call the ad server to get the json response
 				$request_args = array(
-					'user-agent'  => $user_agent,
+					'user-agent' => $user_agent,
 				);
-				$request = wp_remote_get( $dx_url, $request_args );
+				$request      = wp_remote_get( $dx_url, $request_args );
 				if ( is_wp_error( $request ) ) {
 					return $all_ads;
 				}
-				$body = wp_remote_retrieve_body( $request );
+				$body    = wp_remote_retrieve_body( $request );
 				$all_ads = json_decode( $body, true );
 
 				if ( true === $this->cache ) {
 					// cache the json response
 					$cached = $this->cache_set(
 						array(
-							'url' => $current_url,
-							'tag-list' => $tag_list,
+							'url'        => $current_url,
+							'tag-list'   => $tag_list,
 							'user-agent' => $user_agent,
 						),
 						$all_ads
@@ -183,7 +183,7 @@ class Appnexus_ACM_Provider_Front_End {
 	public function filter_output_html( $output_html, $tag_id ) {
 
 		$ad_code_manager = $this->ad_code_manager;
-		$ad_tags = $ad_code_manager->ad_tag_ids;
+		$ad_tags         = $ad_code_manager->ad_tag_ids;
 
 		$output_html = '';
 		switch ( $tag_id ) {
@@ -236,10 +236,10 @@ class Appnexus_ACM_Provider_Front_End {
 						/*$output_html = '';
 						$output_html .= "
 						<script>
-						  var oas_tag = oas_tag || {};
-						  oas_tag.url = '" . $this->default_url . "';
-						  oas_tag.sizes = function() {
-						  ";
+							var oas_tag = oas_tag || {};
+							oas_tag.url = '" . $this->default_url . "';
+							oas_tag.sizes = function() {
+						";
 						foreach ( $tags as $tag ) {
 							$output_html .= 'oas_tag.definePOS("' . $tag . '");' . "\n";
 						}
@@ -248,12 +248,12 @@ class Appnexus_ACM_Provider_Front_End {
 						$output_html .= "(function() {
 							oas_tag.version ='1';oas_tag.loadAd = oas_tag.loadAd || function(){};
 							var oas = document.createElement('script'),
-				              protocol = 'https:' == document.location.protocol?'https://':'http://',
-				              node = document.getElementsByTagName('script')[0];
-				              oas.type = 'text/javascript'; oas.async = true;
-				              oas.src = oas_tag.url + '/om/' + oas_tag.version + '.js';
-				              node.parentNode.insertBefore(oas, node);
-						})();
+							protocol = 'https:' == document.location.protocol?'https://':'http://',
+							node = document.getElementsByTagName('script')[0];
+							oas.type = 'text/javascript'; oas.async = true;
+							oas.src = oas_tag.url + '/om/' + oas_tag.version + '.js';
+							node.parentNode.insertBefore(oas, node);
+							})();
 						</script>";*/
 						break;
 					default:
@@ -301,7 +301,7 @@ class Appnexus_ACM_Provider_Front_End {
 		global $wp_query;
 		if ( is_object( $wp_query->queried_object ) ) {
 			$post_type = isset( $wp_query->queried_object->post_type ) ? isset( $wp_query->queried_object->post_type ) : '';
-			$post_id = isset( $wp_query->queried_object->ID ) ? $wp_query->queried_object->ID : '';
+			$post_id   = isset( $wp_query->queried_object->ID ) ? $wp_query->queried_object->ID : '';
 		} else {
 			return $content;
 		}
@@ -320,7 +320,7 @@ class Appnexus_ACM_Provider_Front_End {
 			// $match[1][xx] .... matched tag type ( ad )
 			// $match[2][xx] .... matched position ( Middle )
 			foreach ( $match[0] as $key => $value ) {
-				$position = ( isset( $match[2][ $key ] ) && '' !== $match[2][ $key ] ) ? $match[2][ $key ] : get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
+				$position  = ( isset( $match[2][ $key ] ) && '' !== $match[2][ $key ] ) ? $match[2][ $key ] : get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
 				$rewrite[] = $this->get_code_to_insert( $position );
 				$matched[] = $match[0][ $key ];
 			}
@@ -437,7 +437,7 @@ class Appnexus_ACM_Provider_Front_End {
 			$multiple_embeds = $multiple_embeds[0];
 		}
 
-		$end = strlen( $content );
+		$end      = strlen( $content );
 		$position = $end;
 
 		if ( '1' === $multiple_embeds ) {
@@ -445,19 +445,19 @@ class Appnexus_ACM_Provider_Front_End {
 			$insert_every_paragraphs = get_option( $this->option_prefix . 'insert_every_paragraphs', 4 );
 			$minimum_paragraph_count = get_option( $this->option_prefix . 'minimum_paragraph_count', 6 );
 
-			$embed_prefix = get_option( $this->option_prefix . 'embed_prefix', 'x' );
-			$start_embed_id = get_option( $this->option_prefix . 'start_tag_id', 'x100' );
+			$embed_prefix      = get_option( $this->option_prefix . 'embed_prefix', 'x' );
+			$start_embed_id    = get_option( $this->option_prefix . 'start_tag_id', 'x100' );
 			$start_embed_count = intval( str_replace( $embed_prefix, '', $start_embed_id ) ); // ex 100
-			$end_embed_id = get_option( $this->option_prefix . 'end_embed_id', 'x110' );
-			$end_embed_count = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
+			$end_embed_id      = get_option( $this->option_prefix . 'end_embed_id', 'x110' );
+			$end_embed_count   = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
 
 			$paragraph_positions = array();
-			$last_position = -1;
-			$paragraph_end = $this->paragraph_end;
+			$last_position       = -1;
+			$paragraph_end       = $this->paragraph_end;
 
 			while ( stripos( $content, $paragraph_end, $last_position + 1 ) !== false ) {
 				// Get the position of the end of the next $paragraph_end.
-				$last_position = stripos( $content, $paragraph_end, $last_position + 1 ) + 3; // what does the 3 mean?
+				$last_position         = stripos( $content, $paragraph_end, $last_position + 1 ) + 3; // what does the 3 mean?
 				$paragraph_positions[] = $last_position;
 			}
 
@@ -467,7 +467,7 @@ class Appnexus_ACM_Provider_Front_End {
 				$n = $start_embed_count;
 				// Safety check number: stores the position of the last insertion.
 				$previous_position = $start_embed_count;
-				$i = 0;
+				$i                 = 0;
 				while ( $i < count( $paragraph_positions ) && $n <= $end_embed_count ) {
 					// Modulo math to only output shortcode after $insert_every_paragraphs closing paragraph tags.
 					// +1 because of zero-based indexing.
@@ -501,8 +501,8 @@ class Appnexus_ACM_Provider_Front_End {
 				}
 			}
 		} else {
-			$tag_id = get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
-			$top_offset = get_option( $this->option_prefix . 'auto_embed_top_offset', 1000 );
+			$tag_id        = get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
+			$top_offset    = get_option( $this->option_prefix . 'auto_embed_top_offset', 1000 );
 			$bottom_offset = get_option( $this->option_prefix . 'auto_embed_bottom_offset', 400 );
 
 			// if the content is longer than the minimum ad spot find a break.
@@ -510,12 +510,12 @@ class Appnexus_ACM_Provider_Front_End {
 			if ( $position > $top_offset ) {
 				// find the break point
 				$breakpoints = array(
-					'</p>' => 4,
-					'<br />' => 6,
-					'<br/>' => 5,
-					'<br>' => 4,
+					'</p>'             => 4,
+					'<br />'           => 6,
+					'<br/>'            => 5,
+					'<br>'             => 4,
 					'<!--pagebreak-->' => 0,
-					'<p>' => 0,
+					'<p>'              => 0,
 				);
 				// We use strpos on the reversed needle and haystack for speed.
 				foreach ( $breakpoints as $point => $offset ) {
@@ -528,7 +528,7 @@ class Appnexus_ACM_Provider_Front_End {
 			if ( false === $in_editor ) {
 				// If the position is at or near the end of the article.
 				if ( $position > $end - $bottom_offset ) {
-					$position = $end;
+					$position  = $end;
 					$shortcode = $this->get_code_to_insert( $tag_id, 'minnpost-ads-ad-article-end' );
 				} else {
 					$shortcode = $this->get_code_to_insert( $tag_id, 'minnpost-ads-ad-article-middle' );
@@ -556,7 +556,7 @@ class Appnexus_ACM_Provider_Front_End {
 	public function get_code_to_insert( $tag_id, $class = '' ) {
 		// get the code to insert
 		$ad_code_manager = $this->ad_code_manager;
-		$ad_tags = $ad_code_manager->ad_tag_ids;
+		$ad_tags         = $ad_code_manager->ad_tag_ids;
 
 		$matching_ad_code = $ad_code_manager->get_matching_ad_code( $tag_id );
 		if ( ! empty( $matching_ad_code ) ) {
@@ -569,7 +569,7 @@ class Appnexus_ACM_Provider_Front_End {
 					$output_html = '<script>OAS_AD("' . $tag_id . '");</script>';
 					break;
 				case 'nx':
-					$output_html = '';
+					$output_html  = '';
 					$output_html .= '<script>
 					<!--
 					OAS_url = "' . $this->default_domain . '";
@@ -587,24 +587,24 @@ class Appnexus_ACM_Provider_Front_End {
 						</noscript>';
 					break;
 				case 'sx':
-					$not_tags = implode( ',', array_column( $ad_tags, 'tag' ) );
+					$not_tags    = implode( ',', array_column( $ad_tags, 'tag' ) );
 					$output_html = '<iframe src="' . $this->default_url . 'adstream_sx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $not_tags . '!' . $tag_id . '?_RM_IP_=' . $_SERVER['REMOTE_ADDR'] . '" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>';
 					$output_html = $this->lazy_loaded_html_or_not( $output_html, $tag_id );
 					break;
 				case 'dx':
-					$output_html = '';
+					$output_html     = '';
 					$impression_html = '';
 
 					if ( ! empty( $this->all_ads['Ad'] ) ) {
 						$positions = array_column( $this->all_ads['Ad'], 'Pos' );
-						$key = array_search( $tag_id, $positions );
+						$key       = array_search( $tag_id, $positions );
 						if ( is_int( $key ) ) {
 							$ad_html = $this->all_ads['Ad'][ $key ]['Text'];
 
 							// add the impression tracker
 							$impression_html = '<img class="appnexus-ad-impression" src="' . $this->all_ads['Ad'][ $key ]['ImpUrl'] . '" style="width: 1px; height: 1px; position: absolute; visibility: hidden;">';
 
-							$ad_html = $this->lazy_loaded_html_or_not( $ad_html, $tag_id, true );
+							$ad_html         = $this->lazy_loaded_html_or_not( $ad_html, $tag_id, true );
 							$impression_html = $this->lazy_loaded_html_or_not( $impression_html, $tag_id );
 
 							$output_html = $ad_html . $impression_html;
@@ -657,10 +657,10 @@ class Appnexus_ACM_Provider_Front_End {
 
 			if ( true === $check_html ) {
 				$use_filter = false; // if we have to check the html, don't use the filter unless it matches
-				$has_image = false;
+				$has_image  = false;
 				$has_iframe = false;
-				$has_video = false;
-				$has_audio = false;
+				$has_video  = false;
+				$has_audio  = false;
 
 				if ( false !== stripos( $output_html, '<img' ) && false === stripos( $output_html, '<noscript' ) ) {
 					$has_image = true;
@@ -708,11 +708,11 @@ class Appnexus_ACM_Provider_Front_End {
 
 				// if multiples are enabled, check to see if the id is in the embed tag range
 				if ( '1' === $multiple_embeds ) {
-					$embed_prefix = get_option( $this->option_prefix . 'embed_prefix', 'x' );
-					$start_embed_id = get_option( $this->option_prefix . 'start_tag_id', 'x100' );
-					$start_embed_count = intval( str_replace( $embed_prefix, '', $start_embed_id ) ); // ex 100
-					$end_embed_id = get_option( $this->option_prefix . 'end_embed_id', 'x110' );
-					$end_embed_count = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
+					$embed_prefix        = get_option( $this->option_prefix . 'embed_prefix', 'x' );
+					$start_embed_id      = get_option( $this->option_prefix . 'start_tag_id', 'x100' );
+					$start_embed_count   = intval( str_replace( $embed_prefix, '', $start_embed_id ) ); // ex 100
+					$end_embed_id        = get_option( $this->option_prefix . 'end_embed_id', 'x110' );
+					$end_embed_count     = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
 					$current_embed_count = intval( str_replace( $embed_prefix, '', $tag_id ) ); // ex 108
 					if ( ( $current_embed_count > $start_embed_count && $current_embed_count < $end_embed_count ) ) {
 						$use_filter = true;
@@ -773,9 +773,9 @@ class Appnexus_ACM_Provider_Transient {
 	 * @param string $name The name of the field that lists all cache keys.
 	 */
 	public function __construct( $name ) {
-		$this->name = $name;
+		$this->name             = $name;
 		$this->cache_expiration = 600;
-		$this->cache_prefix = esc_sql( 'appnexus_acm_' );
+		$this->cache_prefix     = esc_sql( 'appnexus_acm_' );
 	}
 
 	/**
@@ -797,10 +797,10 @@ class Appnexus_ACM_Provider_Transient {
 	 */
 	public function set( $cachekey, $value ) {
 
-		$prefix = $this->cache_prefix;
+		$prefix   = $this->cache_prefix;
 		$cachekey = $prefix . $cachekey;
 
-		$keys = $this->all_keys();
+		$keys   = $this->all_keys();
 		$keys[] = $cachekey;
 		set_transient( $this->name, $keys, $this->cache_expiration );
 
@@ -814,7 +814,7 @@ class Appnexus_ACM_Provider_Transient {
 	 * @return mixed value of transient. False of empty, otherwise array.
 	 */
 	public function get( $cachekey ) {
-		$prefix = $this->cache_prefix;
+		$prefix   = $this->cache_prefix;
 		$cachekey = $prefix . $cachekey;
 		return get_transient( $cachekey );
 	}
@@ -826,7 +826,7 @@ class Appnexus_ACM_Provider_Transient {
 	 * @return bool True if successful, false otherwise.
 	 */
 	public function delete( $cachekey ) {
-		$prefix = $this->cache_prefix;
+		$prefix   = $this->cache_prefix;
 		$cachekey = $prefix . $cachekey;
 		return delete_transient( $cachekey );
 	}
@@ -837,7 +837,7 @@ class Appnexus_ACM_Provider_Transient {
 	 * @return bool True if successful, false otherwise.
 	 */
 	public function flush() {
-		$keys = $this->all_keys();
+		$keys   = $this->all_keys();
 		$result = true;
 		foreach ( $keys as $key ) {
 			$result = delete_transient( $key );

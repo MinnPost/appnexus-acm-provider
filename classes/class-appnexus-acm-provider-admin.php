@@ -33,10 +33,10 @@ class Appnexus_ACM_Provider_Admin {
 	public function __construct( $option_prefix, $version, $slug, $ad_panel, $front_end ) {
 
 		$this->option_prefix = $option_prefix;
-		$this->version = $version;
-		$this->slug = $slug;
-		$this->ad_panel = $ad_panel;
-		$this->front_end = $front_end;
+		$this->version       = $version;
+		$this->slug          = $slug;
+		$this->ad_panel      = $ad_panel;
+		$this->front_end     = $front_end;
 
 		//$this->mc_form_transients = $this->wordpress->mc_form_transients;
 
@@ -82,7 +82,7 @@ class Appnexus_ACM_Provider_Admin {
 	private function get_admin_tabs() {
 		$tabs = array(
 			'appnexus_acm_settings' => 'AppNexus Settings',
-			'embed_ads_settings' => 'Embed Ads Settings',
+			'embed_ads_settings'    => 'Embed Ads Settings',
 		); // this creates the tabs for the admin
 		return $tabs;
 	}
@@ -100,7 +100,7 @@ class Appnexus_ACM_Provider_Admin {
 
 			<?php
 			$tabs = $this->tabs;
-			$tab = isset( $get_data['tab'] ) ? sanitize_key( $get_data['tab'] ) : 'appnexus_acm_settings';
+			$tab  = isset( $get_data['tab'] ) ? sanitize_key( $get_data['tab'] ) : 'appnexus_acm_settings';
 			$this->render_tabs( $tabs, $tab );
 
 			switch ( $tab ) {
@@ -156,23 +156,23 @@ class Appnexus_ACM_Provider_Admin {
 	public function admin_settings_form() {
 
 		$get_data = filter_input_array( INPUT_GET, FILTER_SANITIZE_STRING );
-		$page = isset( $get_data['tab'] ) ? sanitize_key( $get_data['tab'] ) : 'appnexus_acm_settings';
-		$section = isset( $get_data['tab'] ) ? sanitize_key( $get_data['tab'] ) : 'appnexus_acm_settings';
+		$page     = isset( $get_data['tab'] ) ? sanitize_key( $get_data['tab'] ) : 'appnexus_acm_settings';
+		$section  = isset( $get_data['tab'] ) ? sanitize_key( $get_data['tab'] ) : 'appnexus_acm_settings';
 
-		$input_callback_default = array( $this, 'display_input_field' );
+		$input_callback_default    = array( $this, 'display_input_field' );
 		$textarea_callback_default = array( $this, 'display_textarea' );
-		$input_checkboxes_default = array( $this, 'display_checkboxes' );
-		$input_radio_default = array( $this, 'display_radio' );
-		$input_select_default = array( $this, 'display_select' );
-		$link_default = array( $this, 'display_link' );
+		$input_checkboxes_default  = array( $this, 'display_checkboxes' );
+		$input_radio_default       = array( $this, 'display_radio' );
+		$input_select_default      = array( $this, 'display_select' );
+		$link_default              = array( $this, 'display_link' );
 
 		$all_field_callbacks = array(
-			'text' => $input_callback_default,
-			'textarea' => $textarea_callback_default,
+			'text'       => $input_callback_default,
+			'textarea'   => $textarea_callback_default,
 			'checkboxes' => $input_checkboxes_default,
-			'radio' => $input_radio_default,
-			'select' => $input_select_default,
-			'link' => $link_default,
+			'radio'      => $input_radio_default,
+			'select'     => $input_select_default,
+			'link'       => $link_default,
 		);
 
 		$this->appnexus_acm_settings( 'appnexus_acm_settings', 'appnexus_acm_settings', $all_field_callbacks );
@@ -198,86 +198,86 @@ class Appnexus_ACM_Provider_Admin {
 		add_settings_section( $page, $title, null, $page );
 
 		$settings = array(
-			'default_domain' => array(
-				'title' => __( 'Default domain', 'appnexus-acm-provider' ),
+			'default_domain'                => array(
+				'title'    => __( 'Default domain', 'appnexus-acm-provider' ),
 				'callback' => $callbacks['text'],
-				'page' => $page,
-				'section' => $section,
-				'args' => array(
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
 					'type' => 'text',
 					'desc' => __( 'Enter the ad server domain.', 'appnexus-acm-provider' ),
 				),
 			),
-			'use_https' => array(
-				'title' => __( 'Use HTTPS?', 'appnexus-acm-provider' ),
+			'use_https'                     => array(
+				'title'    => __( 'Use HTTPS?', 'appnexus-acm-provider' ),
 				'callback' => $callbacks['text'],
-				'page' => $page,
-				'section' => $section,
-				'args' => array(
-					'type' => 'checkbox',
-					'desc' => 'Choose whether to use HTTPS on the domain.',
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
+					'type'    => 'checkbox',
+					'desc'    => 'Choose whether to use HTTPS on the domain.',
 					'default' => '1',
 				),
 			),
-			'server_path' => array(
-				'title' => __( 'Server path', 'appnexus-acm-provider' ),
+			'server_path'                   => array(
+				'title'    => __( 'Server path', 'appnexus-acm-provider' ),
 				'callback' => $callbacks['text'],
-				'page' => $page,
-				'section' => $section,
-				'args' => array(
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
 					'type' => 'text',
 					'desc' => '',
 				),
 			),
-			'ad_tag_type' => array(
-				'title' => __( 'Ad tag type', 'appnexus-acm-provider' ),
+			'ad_tag_type'                   => array(
+				'title'    => __( 'Ad tag type', 'appnexus-acm-provider' ),
 				'callback' => $callbacks['select'],
-				'page' => $page,
-				'section' => $section,
-				'args' => array(
-					'type' => 'select',
-					'desc' => '',
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
+					'type'  => 'select',
+					'desc'  => '',
 					'items' => array(
-						'jx' => array(
-							'text' => 'JX',
+						'jx'  => array(
+							'text'  => 'JX',
 							'value' => 'js',
 						),
 						'mjx' => array(
-							'text' => 'MJX',
+							'text'  => 'MJX',
 							'value' => 'mjx',
 						),
-						'nx' => array(
-							'text' => 'NX',
+						'nx'  => array(
+							'text'  => 'NX',
 							'value' => 'nx',
 						),
-						'sx' => array(
-							'text' => 'SX',
+						'sx'  => array(
+							'text'  => 'SX',
 							'value' => 'sx',
 						),
-						'dx' => array(
-							'text' => 'DX',
+						'dx'  => array(
+							'text'  => 'DX',
 							'value' => 'dx',
 						),
 					),
 				),
 			),
-			'tag_list' => array(
-				'title' => __( 'List tags', 'appnexus-acm-provider' ),
+			'tag_list'                      => array(
+				'title'    => __( 'List tags', 'appnexus-acm-provider' ),
 				'callback' => $callbacks['textarea'],
-				'page' => $page,
-				'section' => $section,
-				'args' => array(
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
 					'desc' => 'Enter comma separated list of tags.',
 				),
 			),
 			'show_ads_without_conditionals' => array(
-				'title' => __( 'Show ads without conditionals', 'appnexus-acm-provider' ),
+				'title'    => __( 'Show ads without conditionals', 'appnexus-acm-provider' ),
 				'callback' => $callbacks['text'],
-				'page' => $page,
-				'section' => $section,
-				'args' => array(
-					'type' => 'checkbox',
-					'desc' => 'If an ad has no conditionals, show it everywhere.',
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
+					'type'    => 'checkbox',
+					'desc'    => 'If an ad has no conditionals, show it everywhere.',
 					'default' => '1',
 				),
 			),
@@ -285,32 +285,32 @@ class Appnexus_ACM_Provider_Admin {
 
 		if ( class_exists( 'EasyLazyLoader' ) ) {
 			$settings['lazy_load_ads'] = array(
-				'title' => __( 'Lazy load all ads?', 'appnexus-acm-provider' ),
+				'title'    => __( 'Lazy load all ads?', 'appnexus-acm-provider' ),
 				'callback' => $callbacks['text'],
-				'page' => $page,
-				'section' => $section,
-				'args' => array(
-					'type' => 'checkbox',
-					'desc' => 'Load each ad when the user scrolls near it, regardless of its placement. You can also choose to lazy load only embed ads.',
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
+					'type'    => 'checkbox',
+					'desc'    => 'Load each ad when the user scrolls near it, regardless of its placement. You can also choose to lazy load only embed ads.',
 					'default' => '0',
 				),
 			);
 		}
 
 		foreach ( $settings as $key => $attributes ) {
-			$id = $this->option_prefix . $key;
-			$name = $this->option_prefix . $key;
-			$title = $attributes['title'];
+			$id       = $this->option_prefix . $key;
+			$name     = $this->option_prefix . $key;
+			$title    = $attributes['title'];
 			$callback = $attributes['callback'];
-			$page = $attributes['page'];
-			$section = $attributes['section'];
-			$args = array_merge(
+			$page     = $attributes['page'];
+			$section  = $attributes['section'];
+			$args     = array_merge(
 				$attributes['args'],
 				array(
-					'title' => $title,
-					'id' => $id,
+					'title'     => $title,
+					'id'        => $id,
 					'label_for' => $id,
-					'name' => $name,
+					'name'      => $name,
 				)
 			);
 			add_settings_field( $id, $title, $callback, $page, $section, $args );
@@ -334,11 +334,11 @@ class Appnexus_ACM_Provider_Admin {
 			}
 		}
 		$multiple_embeds = array(
-			'overall' => 'Embed Ad Settings',
-			'multiple_on' => 'Multiple Embeds',
+			'overall'      => 'Embed Ad Settings',
+			'multiple_on'  => 'Multiple Embeds',
 			'multiple_off' => 'Single Embed',
 		);
-		$settings = array();
+		$settings        = array();
 
 		foreach ( $multiple_embeds as $key => $value ) {
 			$section = $section . '_' . $key;
@@ -346,118 +346,118 @@ class Appnexus_ACM_Provider_Admin {
 
 			if ( 'overall' === $key ) {
 				$embed_settings = array(
-					'show_in_editor' => array(
-						'title' => __( 'Show shortcode in editor?', 'appnexus-acm-provider' ),
+					'show_in_editor'          => array(
+						'title'    => __( 'Show shortcode in editor?', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['text'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
-							'type' => 'checkbox',
-							'desc' => 'If checked, the [cms_ad] shortcode(s) will show in the post editor, so it/they can be moved around the post as needed.',
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
+							'type'    => 'checkbox',
+							'desc'    => 'If checked, the [cms_ad] shortcode(s) will show in the post editor, so it/they can be moved around the post as needed.',
 							'default' => '',
 						),
 					),
-					'post_types' => array(
-						'title' => __( 'Post types to embed ads', 'appnexus-acm-provider' ),
+					'post_types'              => array(
+						'title'    => __( 'Post types to embed ads', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['checkboxes'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
-							'type' => 'checkboxes',
-							'desc' => 'By default this will list all post types in your installation.',
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
+							'type'  => 'checkboxes',
+							'desc'  => 'By default this will list all post types in your installation.',
 							'items' => $this->post_type_options(),
 						),
 					),
-					'multiple_embeds' => array(
-						'title' => __( 'Multiple embeds per story?', 'appnexus-acm-provider' ),
+					'multiple_embeds'         => array(
+						'title'    => __( 'Multiple embeds per story?', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['radio'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
-							'type' => 'select',
-							'desc' => '',
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
+							'type'  => 'select',
+							'desc'  => '',
 							'items' => array(
 								'yes' => array(
-									'text' => 'yes',
-									'value' => '1',
-									'id' => 'yes',
-									'desc' => '',
+									'text'    => 'yes',
+									'value'   => '1',
+									'id'      => 'yes',
+									'desc'    => '',
 									'default' => '',
 								),
-								'no' => array(
-									'text' => 'no',
-									'value' => '0',
-									'id' => 'no',
-									'desc' => '',
+								'no'  => array(
+									'text'    => 'no',
+									'value'   => '0',
+									'id'      => 'no',
+									'desc'    => '',
 									'default' => '',
 								),
 							),
 						),
 					),
-					'prevent_ads_field' => array(
-						'title' => __( 'Meta field to prevent ads', 'appnexus-acm-provider' ),
+					'prevent_ads_field'       => array(
+						'title'    => __( 'Meta field to prevent ads', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['text'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
-							'type' => 'text',
-							'desc' => 'Add a wp_postmeta field name used to prevent automatic ads.',
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
+							'type'    => 'text',
+							'desc'    => 'Add a wp_postmeta field name used to prevent automatic ads.',
 							'default' => '_post_prevent_appnexus_ads',
 						),
 					),
 					'prevent_ads_field_value' => array(
-						'title' => __( 'Meta field value to prevent ads', 'appnexus-acm-provider' ),
+						'title'    => __( 'Meta field value to prevent ads', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['text'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
-							'type' => 'text',
-							'desc' => 'Add a wp_postmeta field value used to prevent automatic ads.',
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
+							'type'    => 'text',
+							'desc'    => 'Add a wp_postmeta field value used to prevent automatic ads.',
 							'default' => 'on',
 						),
 					),
 				);
 				if ( class_exists( 'EasyLazyLoader' ) ) {
 					$embed_settings['lazy_load_embeds'] = array(
-						'title' => __( 'Lazy load embed ads?', 'appnexus-acm-provider' ),
+						'title'    => __( 'Lazy load embed ads?', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['text'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
-							'type' => 'checkbox',
-							'desc' => 'If checked, the ad inserter will lazy load embed ads, even if it is not set to lazy load all the other ads.',
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
+							'type'    => 'checkbox',
+							'desc'    => 'If checked, the ad inserter will lazy load embed ads, even if it is not set to lazy load all the other ads.',
 							'default' => '',
 						),
 					);
 				}
 			} elseif ( 'multiple_off' === $key ) {
 				$embed_settings = array(
-					'auto_embed_position' => array(
-						'title' => __( 'Auto embed position', 'appnexus-acm-provider' ),
+					'auto_embed_position'      => array(
+						'title'    => __( 'Auto embed position', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['text'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
 							'type' => 'text',
 							'desc' => __( 'Position for the in-story ad, if it is not otherwise included.', 'appnexus-acm-provider' ),
 						),
 					),
-					'auto_embed_top_offset' => array(
-						'title' => __( 'Auto embed top character offset', 'appnexus-acm-provider' ),
+					'auto_embed_top_offset'    => array(
+						'title'    => __( 'Auto embed top character offset', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['text'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
 							'type' => 'text',
 							'desc' => __( 'How many characters from the top of the story to put the ad.', 'appnexus-acm-provider' ),
 						),
 					),
 					'auto_embed_bottom_offset' => array(
-						'title' => __( 'Auto embed bottom character offset', 'appnexus-acm-provider' ),
+						'title'    => __( 'Auto embed bottom character offset', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['text'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
 							'type' => 'text',
 							'desc' => __( 'How many characters from the bottom of the story to put the ad.', 'appnexus-acm-provider' ),
 						),
@@ -465,76 +465,76 @@ class Appnexus_ACM_Provider_Admin {
 				);
 			} else {
 				$embed_settings = array(
-					'embed_prefix' => array(
-						'title' => __( 'Embed tag prefix', 'appnexus-acm-provider' ),
+					'embed_prefix'            => array(
+						'title'    => __( 'Embed tag prefix', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['text'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
 							'type' => 'text',
 							'desc' => 'Embed tags start with this character.',
 						),
 					),
-					'start_tag_id' => array(
-						'title' => __( 'First embed tag ID', 'appnexus-acm-provider' ),
+					'start_tag_id'            => array(
+						'title'    => __( 'First embed tag ID', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['select'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
-							'type' => 'select',
-							'desc' => 'Pick the tag ID that starts the embed tags. The ad inserter will start here, and continue to the maximum number of embeds.',
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
+							'type'  => 'select',
+							'desc'  => 'Pick the tag ID that starts the embed tags. The ad inserter will start here, and continue to the maximum number of embeds.',
 							'items' => $this->embed_tag_options(),
 						),
 					),
 					'insert_every_paragraphs' => array(
-						'title' => __( 'Number of paragraphs between each insertion', 'appnexus-acm-provider' ),
+						'title'    => __( 'Number of paragraphs between each insertion', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['text'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
-							'type' => 'text',
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
+							'type'    => 'text',
 							'default' => '4',
-							'desc' => __( 'The ad inserter will wait this number of paragraphs after the start of the article, insert the first ad zone, count this many more paragraphs, insert the second ad zone, and so on.', 'appnexus-acm-provider' ),
+							'desc'    => __( 'The ad inserter will wait this number of paragraphs after the start of the article, insert the first ad zone, count this many more paragraphs, insert the second ad zone, and so on.', 'appnexus-acm-provider' ),
 						),
 					),
-					'end_tag_id' => array(
-						'title' => __( 'Last embed tag ID', 'appnexus-acm-provider' ),
+					'end_tag_id'              => array(
+						'title'    => __( 'Last embed tag ID', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['select'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
-							'type' => 'select',
-							'desc' => 'Starting with ' . get_option( $this->option_prefix . 'start_tag_id', 'the first tag ID' ) . ', pick the last tag ID that could display as an embed ad. How many actually display depends on how long the post is, and how often an ad should be displayed. You can safely pick the highest applicable number.',
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
+							'type'  => 'select',
+							'desc'  => 'Starting with ' . get_option( $this->option_prefix . 'start_tag_id', 'the first tag ID' ) . ', pick the last tag ID that could display as an embed ad. How many actually display depends on how long the post is, and how often an ad should be displayed. You can safely pick the highest applicable number.',
 							'items' => $this->embed_tag_options(),
 						),
 					),
 					'minimum_paragraph_count' => array(
-						'title' => __( 'Minimum paragraph count', 'appnexus-acm-provider' ),
+						'title'    => __( 'Minimum paragraph count', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['text'],
-						'page' => $page,
-						'section' => $section,
-						'args' => array(
-							'type' => 'text',
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
+							'type'    => 'text',
 							'default' => '6',
-							'desc' => __( 'This setting allows you to prevent ads from appearing on posts with fewer paragraphs than the threshold.', 'appnexus-acm-provider' ),
+							'desc'    => __( 'This setting allows you to prevent ads from appearing on posts with fewer paragraphs than the threshold.', 'appnexus-acm-provider' ),
 						),
 					),
 				);
 			}
 			foreach ( $embed_settings as $key => $attributes ) {
-				$id = $this->option_prefix . $key;
-				$name = $this->option_prefix . $key;
-				$title = $attributes['title'];
+				$id       = $this->option_prefix . $key;
+				$name     = $this->option_prefix . $key;
+				$title    = $attributes['title'];
 				$callback = $attributes['callback'];
-				$page = $attributes['page'];
-				$section = $attributes['section'];
-				$args = array_merge(
+				$page     = $attributes['page'];
+				$section  = $attributes['section'];
+				$args     = array_merge(
 					$attributes['args'],
 					array(
-						'title' => $title,
-						'id' => $id,
+						'title'     => $title,
+						'id'        => $id,
 						'label_for' => $id,
-						'name' => $name,
+						'name'      => $name,
 					)
 				);
 				add_settings_field( $id, $title, $callback, $page, $section, $args );
@@ -550,18 +550,18 @@ class Appnexus_ACM_Provider_Admin {
 	* @return array $items
 	*/
 	private function embed_tag_options() {
-		$items = array();
-		$list = explode( ', ', get_option( $this->option_prefix . 'tag_list', '' ) );
-		$list = array_map( 'trim', $list );
+		$items        = array();
+		$list         = explode( ', ', get_option( $this->option_prefix . 'tag_list', '' ) );
+		$list         = array_map( 'trim', $list );
 		$embed_prefix = get_option( $this->option_prefix . 'embed_prefix', '' );
 		if ( '' !== $embed_prefix ) {
 			foreach ( $list as $tag ) {
 				if ( strpos( $tag, $embed_prefix ) === 0 ) {
-					$item = array(
-						'text' => $tag,
-						'value' => $tag,
-						'id' => $tag,
-						'desc' => '',
+					$item    = array(
+						'text'    => $tag,
+						'value'   => $tag,
+						'id'      => $tag,
+						'desc'    => '',
 						'default' => '',
 					);
 					$items[] = $item;
@@ -580,11 +580,11 @@ class Appnexus_ACM_Provider_Admin {
 		$types = get_post_types();
 		$items = array();
 		foreach ( $types as $type ) {
-			$item = array(
-				'text' => $type,
-				'value' => $type,
-				'id' => $type,
-				'desc' => '',
+			$item    = array(
+				'text'    => $type,
+				'value'   => $type,
+				'id'      => $type,
+				'desc'    => '',
 				'default' => '',
 			);
 			$items[] = $item;
@@ -599,10 +599,10 @@ class Appnexus_ACM_Provider_Admin {
 	*/
 	public function display_input_field( $args ) {
 		//error_log('args is ' . print_r($args, true));
-		$type   = $args['type'];
-		$id     = $args['label_for'];
-		$name   = $args['name'];
-		$desc   = $args['desc'];
+		$type    = $args['type'];
+		$id      = $args['label_for'];
+		$name    = $args['name'];
+		$desc    = $args['desc'];
 		$checked = '';
 
 		$class = 'regular-text';
@@ -612,7 +612,7 @@ class Appnexus_ACM_Provider_Admin {
 		}
 
 		if ( ! isset( $args['constant'] ) || ! defined( $args['constant'] ) ) {
-			$value  = esc_attr( get_option( $id, '' ) );
+			$value = esc_attr( get_option( $id, '' ) );
 			if ( 'checkbox' === $type ) {
 				if ( '1' === $value ) {
 					$checked = 'checked ';
@@ -650,15 +650,15 @@ class Appnexus_ACM_Provider_Admin {
 	*/
 	public function display_textarea( $args ) {
 		//error_log('args is ' . print_r($args, true));
-		$id     = $args['label_for'];
-		$name   = $args['name'];
-		$desc   = $args['desc'];
+		$id      = $args['label_for'];
+		$name    = $args['name'];
+		$desc    = $args['desc'];
 		$checked = '';
 
 		$class = 'regular-text';
 
 		if ( ! isset( $args['constant'] ) || ! defined( $args['constant'] ) ) {
-			$value  = esc_attr( get_option( $id, '' ) );
+			$value = esc_attr( get_option( $id, '' ) );
 			if ( '' === $value && isset( $args['default'] ) && '' !== $args['default'] ) {
 				$value = $args['default'];
 			}
@@ -688,15 +688,15 @@ class Appnexus_ACM_Provider_Admin {
 	* @param array $args
 	*/
 	public function display_checkboxes( $args ) {
-		$type = 'checkbox';
-		$name = $args['name'];
+		$type         = 'checkbox';
+		$name         = $args['name'];
 		$overall_desc = $args['desc'];
-		$options = get_option( $name, array() );
+		$options      = get_option( $name, array() );
 		foreach ( $args['items'] as $key => $value ) {
-			$text = $value['text'];
-			$id = $value['id'];
-			$desc = $value['desc'];
-			$checked = '';
+			$text        = $value['text'];
+			$id          = $value['id'];
+			$desc        = $value['desc'];
+			$checked     = '';
 			$field_value = isset( $value['value'] ) ? esc_attr( $value['value'] ) : esc_attr( $key );
 
 			if ( is_array( $options ) && in_array( (string) $field_value, $options, true ) ) {
@@ -735,13 +735,13 @@ class Appnexus_ACM_Provider_Admin {
 	public function display_radio( $args ) {
 		$type = 'radio';
 
-		$name = $args['name'];
+		$name       = $args['name'];
 		$group_desc = $args['desc'];
-		$options = get_option( $name, array() );
+		$options    = get_option( $name, array() );
 
 		foreach ( $args['items'] as $key => $value ) {
 			$text = $value['text'];
-			$id = $value['id'];
+			$id   = $value['id'];
 			$desc = $value['desc'];
 			if ( isset( $value['value'] ) ) {
 				$item_value = $value['value'];
@@ -788,10 +788,10 @@ class Appnexus_ACM_Provider_Admin {
 	* @param array $args
 	*/
 	public function display_select( $args ) {
-		$type   = $args['type'];
-		$id     = $args['label_for'];
-		$name   = $args['name'];
-		$desc   = $args['desc'];
+		$type = $args['type'];
+		$id   = $args['label_for'];
+		$name = $args['name'];
+		$desc = $args['desc'];
 		if ( ! isset( $args['constant'] ) || ! defined( $args['constant'] ) ) {
 			$current_value = get_option( $name );
 
@@ -801,8 +801,8 @@ class Appnexus_ACM_Provider_Admin {
 			);
 
 			foreach ( $args['items'] as $key => $value ) {
-				$text = $value['text'];
-				$value = $value['value'];
+				$text     = $value['text'];
+				$value    = $value['value'];
 				$selected = '';
 				if ( $key === $current_value || $value === $current_value ) {
 					$selected = ' selected';
@@ -835,9 +835,9 @@ class Appnexus_ACM_Provider_Admin {
 	* @param array $args
 	*/
 	public function display_link( $args ) {
-		$label   = $args['label'];
-		$desc   = $args['desc'];
-		$url = $args['url'];
+		$label = $args['label'];
+		$desc  = $args['desc'];
+		$url   = $args['url'];
 		if ( isset( $args['link_class'] ) ) {
 			echo sprintf( '<p><a class="%1$s" href="%2$s">%3$s</a></p>',
 				esc_attr( $args['link_class'] ),
