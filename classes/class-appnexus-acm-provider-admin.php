@@ -394,6 +394,28 @@ class Appnexus_ACM_Provider_Admin {
 							),
 						),
 					),
+					'prevent_ads_field' => array(
+						'title' => __( 'Meta field to prevent ads', 'appnexus-acm-provider' ),
+						'callback' => $callbacks['text'],
+						'page' => $page,
+						'section' => $section,
+						'args' => array(
+							'type' => 'text',
+							'desc' => 'Add a wp_postmeta field name used to prevent automatic ads.',
+							'default' => '_post_prevent_appnexus_ads',
+						),
+					),
+					'prevent_ads_field_value' => array(
+						'title' => __( 'Meta field value to prevent ads', 'appnexus-acm-provider' ),
+						'callback' => $callbacks['text'],
+						'page' => $page,
+						'section' => $section,
+						'args' => array(
+							'type' => 'text',
+							'desc' => 'Add a wp_postmeta field value used to prevent automatic ads.',
+							'default' => 'on',
+						),
+					),
 				);
 				if ( class_exists( 'EasyLazyLoader' ) ) {
 					$embed_settings['lazy_load_embeds'] = array(
