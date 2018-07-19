@@ -663,7 +663,7 @@ class Appnexus_ACM_Provider_Admin {
 				$value = $args['default'];
 			}
 
-			echo sprintf( '<textarea name="%1$s" id="%2$s" class="%3$s">%4$s</textarea>',
+			echo sprintf( '<textarea name="%1$s" id="%2$s" class="%3$s" rows="10">%4$s</textarea>',
 				esc_attr( $name ),
 				esc_attr( $id ),
 				sanitize_html_class( $class . esc_html( ' code' ) ),
