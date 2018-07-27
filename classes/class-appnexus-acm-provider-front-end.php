@@ -414,7 +414,7 @@ class Appnexus_ACM_Provider_Front_End {
 		}
 
 		// If we don't have any paragraphs, let's skip the ads for this post
-		if ( ! stripos( $content, $this->paragraph_end ) ) {
+		if ( ! stripos( wpautop( $content ), $this->paragraph_end ) ) {
 			return true;
 		}
 
