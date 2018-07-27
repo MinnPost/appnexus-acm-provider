@@ -2,7 +2,7 @@
   "name": "appnexus-acm-provider",
   "title": "Appnexus ACM Provider",
   "description": "",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "index.js",
   "repository": "https://github.com/MinnPost/appnexus-acm-provider.git",
   "author": "MinnPost",
@@ -41,6 +41,6 @@
     "gulp-util": "~3",
     "gulp-wp-pot": "^2.3.2",
     "npm": "^6.2.0",
-    "webpack": "^4.16.2"
+    "webpack": "^4.16.3"
   }
 }

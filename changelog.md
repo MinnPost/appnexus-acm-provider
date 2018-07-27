@@ -1,6 +1,14 @@
 Changelog
 =========
 
+* 0.0.7 (2018-07-27)
+
+	* Use `wpautop` when checking for presence of paragraphs. This fixes a bug in which the shortcode was not being added correctly for some new posts.
+
+* 0.0.6 (2018-05-23)
+
+	* Add a meta field that allows individual posts to skip ads.
+
 * 0.0.5 (2018-05-11)
 
 	* Add a hook that allows individual posts to skip ads.
