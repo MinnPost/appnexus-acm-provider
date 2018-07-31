@@ -93,7 +93,7 @@ class Appnexus_ACM_Provider_Front_End {
 		}
 
 		// always either replace the shortcodes with ads, or if they are absent disperse ad codes throughout the content
-		add_filter( 'the_content', array( $this, 'insert_and_render_inline_ads' ), 2002 );
+		add_filter( 'the_content', array( $this, 'insert_and_render_inline_ads' ), 10 );
 		add_action( 'wp_head', array( $this, 'action_wp_head' ) );
 	}
 
