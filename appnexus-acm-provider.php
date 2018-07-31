@@ -30,9 +30,13 @@ class Appnexus_ACM_Provider extends ACM_Provider {
 		$this->option_prefix = 'appnexus_acm_provider_';
 		$this->version       = '0.0.7';
 		$this->slug          = 'appnexus-acm-provider';
+		$this->capability    = 'manage_advertising';
 
 		global $ad_code_manager;
 		$this->ad_code_manager = $ad_code_manager;
+
+		// setup
+		$this->add_actions();
 
 		// ACM Ad Panel
 		$this->ad_panel = $this->ad_panel();
@@ -53,6 +57,16 @@ class Appnexus_ACM_Provider extends ACM_Provider {
 	}
 
 	/**
+	* Do actions
+	*
+	*/
+	private function add_actions() {
+		add_action( 'plugins_loaded', array( $this, 'textdomain' ) );
+		register_activation_hook( __FILE__, array( $this, 'activate' ) );
+		register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
+	}
+
+	/**
 	* Load the admin panel
 	* Creates the admin screen for the ACM Ad Code Manager
 	*
@@ -60,7 +74,7 @@ class Appnexus_ACM_Provider extends ACM_Provider {
 	*/
 	private function ad_panel() {
 		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-' . $this->slug . '-ad-panel.php' );
-		$ad_panel = new Appnexus_ACM_Provider_Ad_Panel( $this->option_prefix, $this->version, $this->slug, $this->ad_code_manager );
+		$ad_panel = new Appnexus_ACM_Provider_Ad_Panel( $this->option_prefix, $this->version, $this->slug, $this->capability, $this->ad_code_manager );
 		add_filter( 'acm_ad_code_args', array( $ad_panel, 'filter_ad_code_args' ) );
 		return $ad_panel;
 	}
@@ -73,7 +87,7 @@ class Appnexus_ACM_Provider extends ACM_Provider {
 	*/
 	private function front_end() {
 		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-' . $this->slug . '-front-end.php' );
-		$front_end = new Appnexus_ACM_Provider_Front_End( $this->option_prefix, $this->version, $this->slug, $this->ad_code_manager, $this->ad_panel, $this->ad_tag_ids );
+		$front_end = new Appnexus_ACM_Provider_Front_End( $this->option_prefix, $this->version, $this->slug, $this->capability, $this->ad_code_manager, $this->ad_panel, $this->ad_tag_ids );
 		return $front_end;
 	}
 
@@ -85,7 +99,7 @@ class Appnexus_ACM_Provider extends ACM_Provider {
 	*/
 	private function load_admin() {
 		require_once( plugin_dir_path( __FILE__ ) . 'classes/class-' . $this->slug . '-admin.php' );
-		$admin = new Appnexus_ACM_Provider_Admin( $this->option_prefix, $this->version, $this->slug, $this->ad_panel, $this->front_end );
+		$admin = new Appnexus_ACM_Provider_Admin( $this->option_prefix, $this->version, $this->slug, $this->capability, $this->ad_panel, $this->front_end );
 		add_filter( 'plugin_action_links', array( $this, 'plugin_action_links' ), 10, 2 );
 		return $admin;
 	}
@@ -104,6 +118,36 @@ class Appnexus_ACM_Provider extends ACM_Provider {
 			array_unshift( $links, $settings );
 		}
 		return $links;
+	}
+
+	/**
+	 * Activate plugin
+	 *
+	 * @return void
+	 */
+	public function activate() {
+		// by default, only administrators can configure the plugin
+		$role = get_role( 'administrator' );
+		$role->add_cap( $this->capability );
+	}
+
+	/**
+	 * Deactivate plugin
+	 *
+	 * @return void
+	 */
+	public function deactivate() {
+		$role = get_role( 'administrator' );
+		$role->remove_cap( $this->capability );
+	}
+
+	/**
+	 * Load textdomain
+	 *
+	 * @return void
+	 */
+	public function textdomain() {
+		load_plugin_textdomain( 'appnexus-acm-provider', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 	}
 
 }

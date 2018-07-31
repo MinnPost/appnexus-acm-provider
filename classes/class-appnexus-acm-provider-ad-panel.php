@@ -17,6 +17,7 @@ class Appnexus_ACM_Provider_Ad_Panel {
 	protected $option_prefix;
 	protected $version;
 	protected $slug;
+	protected $capability;
 	protected $ad_code_manager;
 
 	/**
@@ -25,14 +26,16 @@ class Appnexus_ACM_Provider_Ad_Panel {
 	* @param string $option_prefix
 	* @param string $version
 	* @param string $slug
+	* @param string $capability
 	* @param object $ad_code_manager
 	* @throws \Exception
 	*/
-	public function __construct( $option_prefix, $version, $slug, $ad_code_manager ) {
+	public function __construct( $option_prefix, $version, $slug, $capability, $ad_code_manager ) {
 
 		$this->option_prefix   = $option_prefix;
 		$this->version         = $version;
 		$this->slug            = $slug;
+		$this->capability      = $capability;
 		$this->ad_code_manager = $ad_code_manager;
 
 		// Default ad zones for Appnexus

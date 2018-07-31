@@ -17,6 +17,7 @@ class Appnexus_ACM_Provider_Front_End {
 	protected $option_prefix;
 	protected $version;
 	protected $slug;
+	protected $capability;
 	protected $ad_code_manager;
 	protected $ad_panel;
 	protected $ad_tag_ids;
@@ -27,16 +28,18 @@ class Appnexus_ACM_Provider_Front_End {
 	* @param string $option_prefix
 	* @param string $version
 	* @param string $slug
+	* @param string $capability
 	* @param object $ad_code_manager
 	* @param object $ad_panel
 	* @param array $ad_tag_ids
 	* @throws \Exception
 	*/
-	public function __construct( $option_prefix, $version, $slug, $ad_code_manager, $ad_panel, $ad_tag_ids ) {
+	public function __construct( $option_prefix, $version, $slug, $capability, $ad_code_manager, $ad_panel, $ad_tag_ids ) {
 
 		$this->option_prefix   = $option_prefix;
 		$this->version         = $version;
 		$this->slug            = $slug;
+		$this->capability      = $capability;
 		$this->ad_code_manager = $ad_code_manager;
 		$this->ad_panel        = $ad_panel;
 		$this->ad_tag_ids      = $ad_tag_ids;

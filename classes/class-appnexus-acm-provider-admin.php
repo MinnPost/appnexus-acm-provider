@@ -17,6 +17,7 @@ class Appnexus_ACM_Provider_Admin {
 	protected $option_prefix;
 	protected $version;
 	protected $slug;
+	protected $capability;
 	protected $ad_panel;
 	protected $front_end;
 
@@ -26,15 +27,17 @@ class Appnexus_ACM_Provider_Admin {
 	* @param string $option_prefix
 	* @param string $version
 	* @param string $slug
+	* @param string $capability
 	* @param object $ad_panel
 	* @param object $front_end
 	* @throws \Exception
 	*/
-	public function __construct( $option_prefix, $version, $slug, $ad_panel, $front_end ) {
+	public function __construct( $option_prefix, $version, $slug, $capability, $ad_panel, $front_end ) {
 
 		$this->option_prefix = $option_prefix;
 		$this->version       = $version;
 		$this->slug          = $slug;
+		$this->capability    = $capability;
 		$this->ad_panel      = $ad_panel;
 		$this->front_end     = $front_end;
 
@@ -55,7 +58,6 @@ class Appnexus_ACM_Provider_Admin {
 			add_action( 'admin_menu', array( $this, 'create_admin_menu' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts_and_styles' ) );
 			add_action( 'admin_init', array( $this, 'admin_settings_form' ) );
-			add_action( 'plugins_loaded', array( $this, 'textdomain' ) );
 		}
 
 	}
@@ -66,7 +68,7 @@ class Appnexus_ACM_Provider_Admin {
 	* @param array $args
 	*/
 	public function create_admin_menu() {
-		add_options_page( __( 'AppNexus Ad Settings', 'appnexus-acm-provider' ), __( 'AppNexus Ad Settings', 'appnexus-acm-provider' ), 'manage_options', 'appnexus-acm-provider', array( $this, 'show_admin_page' ) );
+		add_options_page( __( 'AppNexus Ad Settings', 'appnexus-acm-provider' ), __( 'AppNexus Ad Settings', 'appnexus-acm-provider' ), $this->capability, 'appnexus-acm-provider', array( $this, 'show_admin_page' ) );
 	}
 
 	/**
@@ -857,15 +859,6 @@ class Appnexus_ACM_Provider_Admin {
 			);
 		}
 
-	}
-
-	/**
-	 * Load textdomain
-	 *
-	 * @return void
-	 */
-	public function textdomain() {
-		load_plugin_textdomain( 'appnexus-acm-provider', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 	}
 
 }
