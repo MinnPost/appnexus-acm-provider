@@ -349,10 +349,12 @@ class Appnexus_ACM_Provider_Front_End {
 	 */
 	public function insert_inline_ad_in_editor( $content = '', $post_id ) {
 
+		/*
+		// todo: i think this would be nice, but i think it won't work like this
 		$user_id = get_current_user_id();
 		if ( ! user_can( $user_id, $this->capability ) ) {
 			return $content;
-		}
+		}*/
 
 		$post_type = get_post_type( $post_id );
 		$in_editor = true;

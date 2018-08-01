@@ -1,6 +1,10 @@
 Changelog
 =========
 
+* 0.0.8 (2018-08-01)
+
+	* Fix the ad inserter for inside the editor so it accomodates the newline breaks that the editor uses.
+
 * 0.0.7 (2018-07-27)
 
 	* Use `wpautop` when checking for presence of paragraphs. This fixes a bug in which the shortcode was not being added correctly for some new posts.
