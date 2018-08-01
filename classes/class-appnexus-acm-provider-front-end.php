@@ -448,6 +448,8 @@ class Appnexus_ACM_Provider_Front_End {
 		$end      = strlen( $content );
 		$position = $end;
 
+		$paragraph_end = $this->paragraph_end;
+
 		if ( '1' === $multiple_embeds ) {
 
 			$insert_every_paragraphs = get_option( $this->option_prefix . 'insert_every_paragraphs', 4 );
@@ -461,7 +463,6 @@ class Appnexus_ACM_Provider_Front_End {
 
 			$paragraph_positions = array();
 			$last_position       = -1;
-			$paragraph_end       = $this->paragraph_end;
 
 			while ( stripos( $content, $paragraph_end, $last_position + 1 ) !== false ) {
 				// Get the position of the end of the next $paragraph_end.
@@ -485,7 +486,7 @@ class Appnexus_ACM_Provider_Front_End {
 						if ( false === $in_editor ) {
 							$shortcode = $this->get_code_to_insert( $embed_prefix . (int) $n );
 						} elseif ( true === $in_editor ) {
-							$shortcode = '[cms_ad:' . $embed_prefix . (int) $n . ']';
+							$shortcode = "\n" . '[cms_ad:' . $embed_prefix . (int) $n . ']' . "\n";
 						}
 						$position = $paragraph_positions[ $i ] + 1;
 						// Safety check:
@@ -524,6 +525,7 @@ class Appnexus_ACM_Provider_Front_End {
 					'<br>'             => 4,
 					'<!--pagebreak-->' => 0,
 					'<p>'              => 0,
+					"\n"               => 2,
 				);
 				// We use strpos on the reversed needle and haystack for speed.
 				foreach ( $breakpoints as $point => $offset ) {
@@ -542,7 +544,7 @@ class Appnexus_ACM_Provider_Front_End {
 					$shortcode = $this->get_code_to_insert( $tag_id, 'minnpost-ads-ad-article-middle' );
 				}
 			} else {
-				$shortcode = '[cms_ad:' . $tag_id . ']';
+				$shortcode = "\n" . '[cms_ad:' . $tag_id . ']' . "\n";
 			}
 
 			$content = substr_replace( $content, $shortcode, $position, 0 );
