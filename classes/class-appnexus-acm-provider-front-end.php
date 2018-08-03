@@ -93,7 +93,8 @@ class Appnexus_ACM_Provider_Front_End {
 		}
 
 		// always either replace the shortcodes with ads, or if they are absent disperse ad codes throughout the content
-		add_filter( 'the_content', array( $this, 'insert_and_render_inline_ads' ), 10 );
+		add_shortcode( 'cms_ad', array( $this, 'render_shortcode' ) );
+		add_filter( 'the_content', array( $this, 'insert_and_render_inline_ads' ), 2000 );
 		add_action( 'wp_head', array( $this, 'action_wp_head' ) );
 	}
 
@@ -301,10 +302,11 @@ class Appnexus_ACM_Provider_Front_End {
 	 */
 	public function insert_and_render_inline_ads( $content = '' ) {
 
-		global $wp_query;
-		if ( is_object( $wp_query->queried_object ) ) {
-			$post_type = isset( $wp_query->queried_object->post_type ) ? isset( $wp_query->queried_object->post_type ) : '';
-			$post_id   = isset( $wp_query->queried_object->ID ) ? $wp_query->queried_object->ID : '';
+		//global $wp_query;
+		$current_object = get_queried_object();
+		if ( is_object( $current_object ) ) {
+			$post_type = isset( $current_object->post_type ) ? isset( $current_object->post_type ) : '';
+			$post_id   = isset( $current_object->ID ) ? $current_object->ID : '';
 		} else {
 			return $content;
 		}
@@ -318,14 +320,32 @@ class Appnexus_ACM_Provider_Front_End {
 
 		// Render any `[cms_ad` shortcodes, whether they were manually added or added by this plugin
 		// this should also be used to render the shortcodes added in the editor
-		if ( preg_match_all( '/\[\s*(cms_ad)\s*[:]?(\s*([\w+\/\.]+))?\]/i', $content, $match ) ) {
-			// $match[0][xx] .... fully matched string [ad:Middle1]
-			// $match[1][xx] .... matched tag type ( ad )
-			// $match[2][xx] .... matched position ( Middle )
-			foreach ( $match[0] as $key => $value ) {
-				$position  = ( isset( $match[2][ $key ] ) && '' !== $match[2][ $key ] ) ? $match[2][ $key ] : get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
+		$shortcode = 'cms_ad';
+		$pattern   = get_shortcode_regex();
+		if ( preg_match_all( '/' . $pattern . '/s', $content, $matches ) && array_key_exists( 2, $matches ) && in_array( $shortcode, $matches[2] ) ) {
+
+			/*
+			[0] => Array (
+				[0] => [cms_ad:Middle]
+			)
+
+			[1] => Array(
+				[0] =>
+			)
+
+			[2] => Array(
+				[0] => cms_ad
+			)
+
+			[3] => Array(
+				[0] => :Middle
+			)
+			*/
+
+			foreach ( $matches[0] as $key => $value ) {
+				$position  = ( isset( $matches[3][ $key ] ) && '' !== ltrim( $matches[3][ $key ], ':' ) ) ? ltrim( $matches[3][ $key ], ':' ) : get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
 				$rewrite[] = $this->get_code_to_insert( $position );
-				$matched[] = $match[0][ $key ];
+				$matched[] = $matches[0][ $key ];
 			}
 			return str_replace( $matched, $rewrite, $content );
 		}
@@ -335,6 +355,17 @@ class Appnexus_ACM_Provider_Front_End {
 		$content = $this->insert_ads_into_content( $content, false );
 		return $content;
 
+	}
+
+	/**
+	 * Make [cms_ad] a recognized shortcode
+	 *
+	 * @param array $atts
+	 *
+	 *
+	 */
+	public function render_shortcode( $atts ) {
+		return;
 	}
 
 	/**
