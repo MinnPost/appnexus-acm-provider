@@ -1,6 +1,14 @@
 Changelog
 =========
 
+* 0.0.10 (2018-08-09)
+
+	* Ad a TinyMCE plugin that changes `[cms_ad:type]` shortcodes in the editor into an image that can be moved around easier.
+
+* 0.0.9 (2018-08-03)
+
+	* Fix bug where some manually added ad codes were not rendering.
+
 * 0.0.8 (2018-08-01)
 
 	* Fix the ad inserter for inside the editor so it accomodates the newline breaks that the editor uses.
