@@ -17,122 +17,122 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:71, classes/class-appnexus-acm-provider-admin.php:71
+#: classes/class-appnexus-acm-provider-admin.php:72, classes/class-appnexus-acm-provider-admin.php:72
 msgid "AppNexus Ad Settings"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:101
+#: classes/class-appnexus-acm-provider-admin.php:102
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:204
+#: classes/class-appnexus-acm-provider-admin.php:252
 msgid "Default domain"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:210
+#: classes/class-appnexus-acm-provider-admin.php:258
 msgid "Enter the ad server domain."
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:214
+#: classes/class-appnexus-acm-provider-admin.php:262
 msgid "Use HTTPS?"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:225
+#: classes/class-appnexus-acm-provider-admin.php:273
 msgid "Server path"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:235
+#: classes/class-appnexus-acm-provider-admin.php:283
 msgid "Ad tag type"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:267
+#: classes/class-appnexus-acm-provider-admin.php:315
 msgid "List tags"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:276
+#: classes/class-appnexus-acm-provider-admin.php:324
 msgid "Show ads without conditionals"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:290
+#: classes/class-appnexus-acm-provider-admin.php:338
 msgid "Lazy load all ads?"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:352
+#: classes/class-appnexus-acm-provider-admin.php:400
 msgid "Show shortcode in editor?"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:363
+#: classes/class-appnexus-acm-provider-admin.php:411
 msgid "Post types to embed ads"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:374
+#: classes/class-appnexus-acm-provider-admin.php:422
 msgid "Multiple embeds per story?"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:400
+#: classes/class-appnexus-acm-provider-admin.php:448
 msgid "Meta field to prevent ads"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:411
+#: classes/class-appnexus-acm-provider-admin.php:459
 msgid "Meta field value to prevent ads"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:424
+#: classes/class-appnexus-acm-provider-admin.php:472
 msgid "Lazy load embed ads?"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:438
+#: classes/class-appnexus-acm-provider-admin.php:486
 msgid "Auto embed position"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:444
+#: classes/class-appnexus-acm-provider-admin.php:492
 msgid "Position for the in-story ad, if it is not otherwise included."
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:448
+#: classes/class-appnexus-acm-provider-admin.php:496
 msgid "Auto embed top character offset"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:454
+#: classes/class-appnexus-acm-provider-admin.php:502
 msgid "How many characters from the top of the story to put the ad."
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:458
+#: classes/class-appnexus-acm-provider-admin.php:506
 msgid "Auto embed bottom character offset"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:464
+#: classes/class-appnexus-acm-provider-admin.php:512
 msgid "How many characters from the bottom of the story to put the ad."
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:471
+#: classes/class-appnexus-acm-provider-admin.php:519
 msgid "Embed tag prefix"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:481
+#: classes/class-appnexus-acm-provider-admin.php:529
 msgid "First embed tag ID"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:492
+#: classes/class-appnexus-acm-provider-admin.php:540
 msgid "Number of paragraphs between each insertion"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:499
+#: classes/class-appnexus-acm-provider-admin.php:547
 msgid "The ad inserter will wait this number of paragraphs after the start of the article, insert the first ad zone, count this many more paragraphs, insert the second ad zone, and so on."
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:503
+#: classes/class-appnexus-acm-provider-admin.php:551
 msgid "Last embed tag ID"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:514
+#: classes/class-appnexus-acm-provider-admin.php:562
 msgid "Minimum paragraph count"
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:521
+#: classes/class-appnexus-acm-provider-admin.php:569
 msgid "This setting allows you to prevent ads from appearing on posts with fewer paragraphs than the threshold."
 msgstr ""
 
-#: classes/class-appnexus-acm-provider-admin.php:643, classes/class-appnexus-acm-provider-admin.php:681, classes/class-appnexus-acm-provider-admin.php:829
+#: classes/class-appnexus-acm-provider-admin.php:691, classes/class-appnexus-acm-provider-admin.php:729, classes/class-appnexus-acm-provider-admin.php:877
 msgid "Defined in wp-config.php"
 msgstr ""
 

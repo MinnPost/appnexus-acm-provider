@@ -429,7 +429,7 @@ class Appnexus_ACM_Provider_Front_End {
 		} else {
 			// Check that there isn't a line starting with `[cms_ad` already.
 			// If there is, stop adding automatic short code(s). Assume the user is doing it manually.
-			if ( false !== stripos( $content, '[cms_ad' ) ) {
+			if ( false !== stripos( $content, '[cms_ad' ) || false !== stripos( $content, '<img class="mceItem mceAdShortcode' ) ) {
 				return true;
 			}
 		}
