@@ -305,7 +305,7 @@ class Appnexus_ACM_Provider_Front_End {
 		//global $wp_query;
 		$current_object = get_queried_object();
 		if ( is_object( $current_object ) ) {
-			$post_type = isset( $current_object->post_type ) ? isset( $current_object->post_type ) : '';
+			$post_type = isset( $current_object->post_type ) ? $current_object->post_type : '';
 			$post_id   = isset( $current_object->ID ) ? $current_object->ID : '';
 		} else {
 			return $content;
