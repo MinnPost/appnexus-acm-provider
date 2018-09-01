@@ -24,9 +24,13 @@ The plugin's settings URL is `https://<your site>/wp-admin/options-general.php?p
 
 == Changelog ==
 
+* 0.0.11 (2018-09-01)
+
+	* Change the URL for admin JavaScript/CSS.
+
 * 0.0.10 (2018-08-09)
 
-	* Ad a TinyMCE plugin that changes `[cms_ad:type]` shortcodes in the editor into an image that can be moved around easier.
+	* Add a TinyMCE plugin that changes `[cms_ad:type]` shortcodes in the editor into an image that can be moved around easier.
 
 * 0.0.9 (2018-08-03)
 
