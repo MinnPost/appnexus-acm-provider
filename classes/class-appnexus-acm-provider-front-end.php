@@ -292,6 +292,36 @@ class Appnexus_ACM_Provider_Front_End {
 	}
 
 	/**
+	 * Get regular expression for a specific shortcode
+	 *
+	 * @param string $shortcode
+	 * @return string $regex
+	 *
+	 */
+	private function get_single_shortcode_regex( $shortcode ) {
+		// The  $shortcode_tags global variable contains all registered shortcodes.
+		global $shortcode_tags;
+
+		// Store the shortcode_tags global in a temporary variable.
+		$temp_shortcode_tags = $shortcode_tags;
+
+		// Add only one specific shortcode name to the $shortcode_tags global.
+		//
+		// Replace 'related_posts_by_tax' with the shortcode you want to get the regex for.
+		// Don't include the brackets from a shortcode.
+		$shortcode_tags = array( $shortcode => '' );
+
+		// Create the regex for your shortcode.
+		$regex = '/' . get_shortcode_regex() . '/s';
+
+		// Restore the $shortcode_tags global.
+		$shortcode_tags = $temp_shortcode_tags;
+
+		// Print the regex.
+		return $regex;
+	}
+
+	/**
 	 * Use one or more inline ads, depending on the settings. This does not place them into the post editor, but into the post when it renders.
 	 *
 	 * @param string $content
@@ -321,8 +351,8 @@ class Appnexus_ACM_Provider_Front_End {
 		// Render any `[cms_ad` shortcodes, whether they were manually added or added by this plugin
 		// this should also be used to render the shortcodes added in the editor
 		$shortcode = 'cms_ad';
-		$pattern   = get_shortcode_regex();
-		if ( preg_match_all( '/' . $pattern . '/s', $content, $matches ) && array_key_exists( 2, $matches ) && in_array( $shortcode, $matches[2] ) ) {
+		$pattern   = $this->get_single_shortcode_regex( $shortcode );
+		if ( preg_match_all( $pattern, $content, $matches ) && array_key_exists( 2, $matches ) && in_array( $shortcode, $matches[2] ) ) {
 
 			/*
 			[0] => Array (
