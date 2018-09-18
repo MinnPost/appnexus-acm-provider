@@ -85,6 +85,7 @@ class Appnexus_ACM_Provider_Front_End {
 		add_action( 'wp_loaded', array( $this, 'store_ad_response' ) );
 		add_filter( 'acm_output_html', array( $this, 'filter_output_html' ), 10, 2 );
 		add_filter( 'acm_display_ad_codes_without_conditionals', array( $this, 'check_conditionals' ) );
+		add_filter( 'acm_conditional_args', array( $this, 'conditional_args' ), 10, 2 );
 
 		// disperse shortcodes in the editor if the settings say to
 		$show_in_editor = get_option( $this->option_prefix . 'show_in_editor', '0' );
@@ -289,6 +290,21 @@ class Appnexus_ACM_Provider_Front_End {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Additional arguments for conditionals
+	 *
+	 * @param array $args
+	 * @param string $function
+	 * @return array $args
+	 *
+	 */
+	public function conditional_args( $args, $function ) {
+		if ( 'has_tag' === $function || 'has_category' === $function ) {
+			$args[] = 'is_singular';
+		}
+		return $args;
 	}
 
 	/**
