@@ -1,6 +1,14 @@
 Changelog
 =========
 
+* 0.0.13 (2018-09-18)
+
+	* Prevent false positives on has_category or has_tag conditionals for archive pages.
+
+* 0.0.12 (2018-09-18)
+
+	* Make the admin table sortable
+
 * 0.0.11 (2018-09-01)
 
 	* Change the URL for admin JavaScript/CSS.

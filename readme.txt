@@ -4,7 +4,7 @@ Donate link: https://www.minnpost.com/support/?campaign=7010G0000012fXGQAY
 Tags: ads, ad code manager, appnexus
 Requires at least: 4.9
 Tested up to: 4.9
-Stable tag: 0.0.12
+Stable tag: 0.0.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,6 +23,10 @@ In the Plugins list in WordPress, activate the plugin and find the settings link
 The plugin's settings URL is `https://<your site>/wp-admin/options-general.php?page=appnexus-acm-provider`. Ad codes appear in the Ad Code Manager's interface at `https://<your site>/wp-admin/tools.php?page=ad-code-manager`.
 
 == Changelog ==
+
+* 0.0.13 (2018-09-18)
+
+	* Prevent false positives on has_category or has_tag conditionals for archive pages.
 
 * 0.0.12 (2018-09-18)
 
