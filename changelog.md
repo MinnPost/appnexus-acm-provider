@@ -1,6 +1,10 @@
 Changelog
 =========
 
+* 0.0.14 (2018-09-18)
+
+	* Fix the has_category and has_tag fix.
+
 * 0.0.13 (2018-09-18)
 
 	* Prevent false positives on has_category or has_tag conditionals for archive pages.

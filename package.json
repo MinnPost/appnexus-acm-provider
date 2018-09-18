@@ -2,7 +2,7 @@
   "name": "appnexus-acm-provider",
   "title": "Appnexus ACM Provider",
   "description": "",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "main": "index.js",
   "repository": "https://github.com/MinnPost/appnexus-acm-provider.git",
   "author": "MinnPost",
