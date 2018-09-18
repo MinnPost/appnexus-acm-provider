@@ -301,8 +301,15 @@ class Appnexus_ACM_Provider_Front_End {
 	 *
 	 */
 	public function conditional_args( $args, $function ) {
-		if ( 'has_tag' === $function || 'has_category' === $function ) {
-			$args[] = 'is_singular';
+		global $wp_query;
+		// has_category and has_tag use has_term
+		// we should pass queried object id for it to produce correct result
+
+		if ( in_array( $function, array( 'has_category', 'has_tag' ) ) ) {
+			if ( true === $wp_query->is_single ) {
+				$args[] = $wp_query->queried_object->ID;
+			}
+			$args['is_singular'] = true;
 		}
 		return $args;
 	}
