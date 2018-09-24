@@ -96,6 +96,7 @@ class Appnexus_ACM_Provider_Front_End {
 		// always either replace the shortcodes with ads, or if they are absent disperse ad codes throughout the content
 		add_shortcode( 'cms_ad', array( $this, 'render_shortcode' ) );
 		add_filter( 'the_content', array( $this, 'insert_and_render_inline_ads' ), 2000 );
+		add_filter( 'the_content_feed', array( $this, 'insert_and_render_inline_ads' ), 2000 );
 		add_action( 'wp_head', array( $this, 'action_wp_head' ) );
 	}
 
@@ -354,9 +355,12 @@ class Appnexus_ACM_Provider_Front_End {
 	 *
 	 */
 	public function insert_and_render_inline_ads( $content = '' ) {
-
-		//global $wp_query;
-		$current_object = get_queried_object();
+		if ( is_feed() ) {
+			global $wp_query;
+			$current_object = $wp_query;
+		} else {
+			$current_object = get_queried_object();
+		}
 		if ( is_object( $current_object ) ) {
 			$post_type = isset( $current_object->post_type ) ? $current_object->post_type : '';
 			$post_id   = isset( $current_object->ID ) ? $current_object->ID : '';
@@ -476,7 +480,7 @@ class Appnexus_ACM_Provider_Front_End {
 			if ( ! in_the_loop() || ! is_main_query() ) {
 				return true;
 			}
-			if ( ! is_single() ) {
+			if ( ! is_single() && ! is_feed() ) {
 				return true;
 			}
 		} else {
