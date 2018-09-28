@@ -14,17 +14,26 @@ function showEmbedOptions(field, multiple) {
 	}
 }
 
+function setEmbedTags(value) {
+	console.log('value is ' + value);
+}
+
 // as the drupal plugin does, we only allow one field to be a prematch or key
 $(document).on('click', 'input[name="appnexus_acm_provider_multiple_embeds[]"]', function() {
 	var multiple = $(this).val();
 	showEmbedOptions($(this), multiple);
 });
 
+$(document).on('change', 'input[name="appnexus_acm_provider_embed_prefix"]', function() {
+	var prefix = $(this).val();
+	setEmbedTags(prefix);
+});
+
 $(document).ready(function() {
-	var fieldname = 'input[name="appnexus_acm_provider_multiple_embeds[]"]';
-	if ( $(fieldname).length) {
-		var field = $(fieldname);
-		var multiple = $(fieldname + ':checked').val();
-		showEmbedOptions(field, multiple);
+	var embedFieldname = 'input[name="appnexus_acm_provider_multiple_embeds[]"]';
+	if ( $(embedFieldname).length) {
+		var embedField = $(embedFieldname);
+		var multipleEmbed = $(embedFieldname + ':checked').val();
+		showEmbedOptions(embedField, multipleEmbed);
 	}
 });

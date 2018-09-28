@@ -299,6 +299,18 @@ class Appnexus_ACM_WP_List_Table extends ACM_WP_List_Table {
 	}
 
 	/**
+	 * Output a search box for the table
+	 */
+	public function display_tablenav( $which ) { ?>
+		<form action="" method="POST">
+			<?php $this->search_box( __( 'Search' ), 'search-box-id' ); ?>
+			<input type="hidden" name="page" value="<?php echo esc_attr( $_REQUEST['page'] ); ?>">
+		</form>
+		<?php
+	}
+
+
+	/**
 	 * Output the tag cell in the list table
 	 */
 	function column_tag( $item ) {
