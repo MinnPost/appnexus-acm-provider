@@ -1,6 +1,10 @@
 Changelog
 =========
 
+* 0.0.15 (2018-09-28)
+
+	* Allow for a field that prevents only automatic ads, but still allows manually added ads.
+
 * 0.0.14 (2018-09-18)
 
 	* Fix the has_category and has_tag fix.
