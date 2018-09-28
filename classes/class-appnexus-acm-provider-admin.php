@@ -396,7 +396,7 @@ class Appnexus_ACM_Provider_Admin {
 
 			if ( 'overall' === $key ) {
 				$embed_settings = array(
-					'show_in_editor'          => array(
+					'show_in_editor'                    => array(
 						'title'    => __( 'Show shortcode in editor?', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['text'],
 						'page'     => $page,
@@ -407,7 +407,7 @@ class Appnexus_ACM_Provider_Admin {
 							'default' => '',
 						),
 					),
-					'post_types'              => array(
+					'post_types'                        => array(
 						'title'    => __( 'Post types to embed ads', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['checkboxes'],
 						'page'     => $page,
@@ -418,7 +418,7 @@ class Appnexus_ACM_Provider_Admin {
 							'items' => $this->post_type_options(),
 						),
 					),
-					'multiple_embeds'         => array(
+					'multiple_embeds'                   => array(
 						'title'    => __( 'Multiple embeds per story?', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['radio'],
 						'page'     => $page,
@@ -444,19 +444,41 @@ class Appnexus_ACM_Provider_Admin {
 							),
 						),
 					),
-					'prevent_ads_field'       => array(
+					'prevent_ads_field'                 => array(
 						'title'    => __( 'Meta field to prevent ads', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['text'],
 						'page'     => $page,
 						'section'  => $section,
 						'args'     => array(
 							'type'    => 'text',
-							'desc'    => 'Add a wp_postmeta field name used to prevent automatic ads.',
+							'desc'    => 'Add a wp_postmeta field name used to prevent all ads.',
 							'default' => '_post_prevent_appnexus_ads',
 						),
 					),
-					'prevent_ads_field_value' => array(
+					'prevent_ads_field_value'           => array(
 						'title'    => __( 'Meta field value to prevent ads', 'appnexus-acm-provider' ),
+						'callback' => $callbacks['text'],
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
+							'type'    => 'text',
+							'desc'    => 'Add a wp_postmeta field value used to prevent all ads.',
+							'default' => 'on',
+						),
+					),
+					'prevent_automatic_ads_field'       => array(
+						'title'    => __( 'Meta field to prevent automatic ads', 'appnexus-acm-provider' ),
+						'callback' => $callbacks['text'],
+						'page'     => $page,
+						'section'  => $section,
+						'args'     => array(
+							'type'    => 'text',
+							'desc'    => 'Add a wp_postmeta field name used to prevent automatic ads.',
+							'default' => '_post_prevent_automatic_appnexus_ads',
+						),
+					),
+					'prevent_automatic_ads_field_value' => array(
+						'title'    => __( 'Meta field value to prevent automatic ads', 'appnexus-acm-provider' ),
 						'callback' => $callbacks['text'],
 						'page'     => $page,
 						'section'  => $section,
