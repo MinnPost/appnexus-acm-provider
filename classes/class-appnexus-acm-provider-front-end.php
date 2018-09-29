@@ -505,6 +505,11 @@ class Appnexus_ACM_Provider_Front_End {
 			return true;
 		}
 
+		// If this post has that option set to not add automatic ads, skip them in the front end view unless they have been manually added.
+		if ( false === $in_editor && get_post_meta( $post_id, $field_automatic_name, true ) === $field_automatic_value && false === stripos( $content, '[cms_ad' ) && false === stripos( $content, '<img class="mceItem mceAdShortcode' ) ) {
+			return true;
+		}
+
 		// allow developers to prevent automatic ads
 		$prevent_automatic_ads = apply_filters( 'appnexus_acm_provider_prevent_automatic_ads', false, $post_id );
 		if ( true === $prevent_automatic_ads ) {
