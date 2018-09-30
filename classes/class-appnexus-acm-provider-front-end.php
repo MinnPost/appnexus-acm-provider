@@ -567,7 +567,7 @@ class Appnexus_ACM_Provider_Front_End {
 			$embed_prefix      = get_option( $this->option_prefix . 'embed_prefix', 'x' );
 			$start_embed_id    = get_option( $this->option_prefix . 'start_tag_id', 'x100' );
 			$start_embed_count = intval( str_replace( $embed_prefix, '', $start_embed_id ) ); // ex 100
-			$end_embed_id      = get_option( $this->option_prefix . 'end_embed_id', 'x110' );
+			$end_embed_id      = get_option( $this->option_prefix . 'end_tag_id', 'x110' );
 			$end_embed_count   = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
 
 			$paragraph_positions = array();
@@ -830,7 +830,7 @@ class Appnexus_ACM_Provider_Front_End {
 					$embed_prefix        = get_option( $this->option_prefix . 'embed_prefix', 'x' );
 					$start_embed_id      = get_option( $this->option_prefix . 'start_tag_id', 'x100' );
 					$start_embed_count   = intval( str_replace( $embed_prefix, '', $start_embed_id ) ); // ex 100
-					$end_embed_id        = get_option( $this->option_prefix . 'end_embed_id', 'x110' );
+					$end_embed_id        = get_option( $this->option_prefix . 'end_tag_id', 'x110' );
 					$end_embed_count     = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
 					$current_embed_count = intval( str_replace( $embed_prefix, '', $tag_id ) ); // ex 108
 					if ( ( $current_embed_count > $start_embed_count && $current_embed_count < $end_embed_count ) ) {
