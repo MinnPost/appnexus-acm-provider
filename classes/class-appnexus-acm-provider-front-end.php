@@ -571,38 +571,38 @@ class Appnexus_ACM_Provider_Front_End {
 			$end_embed_count   = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
 
 			$paragraphs = [];
-			$split = explode( $paragraph_end, wpautop( $content ) );
-			foreach( $split as $paragraph ) {
-			  // filter out empty paragraphs
-			  if ( strlen( $paragraph ) > 3 ) {
-			      $paragraphs[] = $paragraph . $paragraph_end;
-			  }
+			$split      = explode( $paragraph_end, wpautop( $content ) );
+			foreach ( $split as $paragraph ) {
+				// filter out empty paragraphs
+				if ( strlen( $paragraph ) > 3 ) {
+					$paragraphs[] = $paragraph . $paragraph_end;
+				}
 			}
 
 			$paragraph_count = count( $paragraphs );
 			$maximum_ads     = floor( ( $paragraph_count - $minimum_paragraph_count ) / $insert_every_paragraphs ) + $minimum_paragraph_count;
 
-			$ad_num  = 0;
-			$counter = $minimum_paragraph_count;
+			$ad_num      = 0;
+			$counter     = $minimum_paragraph_count;
 			$embed_count = $start_embed_count;
 
 			for ( $i = 0; $i < $paragraph_count; $i++ ) {
-			    if ( 0 === $counter && $embed_count <= $end_embed_count ) {
-			        // make a shortcode using the number of the shorcode that will be added.
+				if ( 0 === $counter && $embed_count <= $end_embed_count ) {
+					// make a shortcode using the number of the shorcode that will be added.
 					if ( false === $in_editor ) {
 						$shortcode = $this->get_code_to_insert( $embed_prefix . (int) $embed_count );
 					} elseif ( true === $in_editor ) {
 						$shortcode = "\n" . '[cms_ad:' . $embed_prefix . (int) $embed_count . ']' . "\n";
 					}
-			        array_splice( $paragraphs, $i + $ad_num, 0, $shortcode );
-			        $counter = $insert_every_paragraphs;
-			        $ad_num++;
-			        if ( $ad_num > $maximum_ads ) {
-			            break;
-			        }
-			        $embed_count++;
-			    }
-			    $counter--;
+					array_splice( $paragraphs, $i + $ad_num, 0, $shortcode );
+					$counter = $insert_every_paragraphs;
+					$ad_num++;
+					if ( $ad_num > $maximum_ads ) {
+						break;
+					}
+					$embed_count++;
+				}
+				$counter--;
 			}
 
 			$content = implode( '', $paragraphs );
