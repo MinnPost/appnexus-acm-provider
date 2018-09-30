@@ -570,54 +570,43 @@ class Appnexus_ACM_Provider_Front_End {
 			$end_embed_id      = get_option( $this->option_prefix . 'end_tag_id', 'x110' );
 			$end_embed_count   = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
 
-			$paragraph_positions = array();
-			$last_position       = -1;
-
-			while ( stripos( $content, $paragraph_end, $last_position + 1 ) !== false ) {
-				// Get the position of the end of the next $paragraph_end.
-				$last_position         = stripos( $content, $paragraph_end, $last_position + 1 ) + 3; // what does the 3 mean?
-				$paragraph_positions[] = $last_position;
+			$paragraphs = [];
+			$split = explode( $paragraph_end, wpautop( $content ) );
+			foreach( $split as $paragraph ) {
+			  // filter out empty paragraphs
+			  if ( strlen( $paragraph ) > 3 ) {
+			      $paragraphs[] = $paragraph . $paragraph_end;
+			  }
 			}
 
-			// If the total number of paragraphs is bigger than the minimum number of paragraphs
-			if ( count( $paragraph_positions ) >= $minimum_paragraph_count ) {
-				// How many shortcodes have been added?
-				$n = $start_embed_count;
-				// Safety check number: stores the position of the last insertion.
-				$previous_position = $start_embed_count;
-				$i                 = 0;
-				while ( $i < count( $paragraph_positions ) && $n <= $end_embed_count ) {
-					// Modulo math to only output shortcode after $insert_every_paragraphs closing paragraph tags.
-					// +1 because of zero-based indexing.
-					if ( 0 === ( $i + 1 ) % $insert_every_paragraphs && isset( $paragraph_positions[ $i ] ) ) {
-						// make a shortcode using the number of the shorcode that will be added.
-						// Using "" here so we can interpolate the variable.
-						if ( false === $in_editor ) {
-							$shortcode = $this->get_code_to_insert( $embed_prefix . (int) $n );
-						} elseif ( true === $in_editor ) {
-							$shortcode = "\n" . '[cms_ad:' . $embed_prefix . (int) $n . ']' . "\n";
-						}
-						$position = $paragraph_positions[ $i ] + 1;
-						// Safety check:
-						// If the position we're adding the shortcode is at a lower point in the story than the position we're adding,
-						// Then something has gone wrong and we should insert no more shortcodes.
-						if ( $position > $previous_position ) {
-							$content = substr_replace( $content, $shortcode, $paragraph_positions[ $i ] + 1, 0 );
-							// Increase the saved last position.
-							$previous_position = $position;
-							// Increment number of shortcodes added to the post.
-							$n++;
-						}
-						// Increase the position of later shortcodes by the length of the current shortcode.
-						foreach ( $paragraph_positions as $j => $pp ) {
-							if ( $j > $i ) {
-								$paragraph_positions[ $j ] = $pp + strlen( $shortcode );
-							}
-						}
+			$paragraph_count = count( $paragraphs );
+			$maximum_ads     = floor( ( $paragraph_count - $minimum_paragraph_count ) / $insert_every_paragraphs ) + $minimum_paragraph_count;
+
+			$ad_num  = 0;
+			$counter = $minimum_paragraph_count;
+			$embed_count = $start_embed_count;
+
+			for ( $i = 0; $i < $paragraph_count; $i++ ) {
+			    if ( 0 === $counter && $embed_count <= $end_embed_count ) {
+			        // make a shortcode using the number of the shorcode that will be added.
+					if ( false === $in_editor ) {
+						$shortcode = $this->get_code_to_insert( $embed_prefix . (int) $embed_count );
+					} elseif ( true === $in_editor ) {
+						$shortcode = "\n" . '[cms_ad:' . $embed_prefix . (int) $embed_count . ']' . "\n";
 					}
-					$i++;
-				}
+			        array_splice( $paragraphs, $i + $ad_num, 0, $shortcode );
+			        $counter = $insert_every_paragraphs;
+			        $ad_num++;
+			        if ( $ad_num > $maximum_ads ) {
+			            break;
+			        }
+			        $embed_count++;
+			    }
+			    $counter--;
 			}
+
+			$content = implode( '', $paragraphs );
+
 		} else {
 			$tag_id        = get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
 			$top_offset    = get_option( $this->option_prefix . 'auto_embed_top_offset', 1000 );
