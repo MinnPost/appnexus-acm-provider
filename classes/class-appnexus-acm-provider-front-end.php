@@ -561,8 +561,8 @@ class Appnexus_ACM_Provider_Front_End {
 
 		if ( '1' === $multiple_embeds ) {
 
-			$insert_every_paragraphs = get_option( $this->option_prefix . 'insert_every_paragraphs', 4 );
-			$minimum_paragraph_count = get_option( $this->option_prefix . 'minimum_paragraph_count', 6 );
+			$insert_every_paragraphs = intval( get_option( $this->option_prefix . 'insert_every_paragraphs', 4 ) );
+			$minimum_paragraph_count = intval( get_option( $this->option_prefix . 'minimum_paragraph_count', 6 ) );
 
 			$embed_prefix      = get_option( $this->option_prefix . 'embed_prefix', 'x' );
 			$start_embed_id    = get_option( $this->option_prefix . 'start_tag_id', 'x100' );
