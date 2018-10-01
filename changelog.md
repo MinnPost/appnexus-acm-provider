@@ -1,6 +1,10 @@
 Changelog
 =========
 
+* 0.0.16 (2018-09-30)
+
+	* Fix the calculation of how often to place automatic ads.
+
 * 0.0.15 (2018-09-28)
 
 	* Allow for a field that prevents only automatic ads, but still allows manually added ads.
