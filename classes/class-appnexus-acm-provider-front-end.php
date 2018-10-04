@@ -149,6 +149,9 @@ class Appnexus_ACM_Provider_Front_End {
 					);
 				}
 			}
+		} elseif ( 'jx' === $this->tag_type ) {
+			$tag_list = array_column( $this->ad_tag_ids, 'tag' );
+			$all_ads  = $tag_list;
 		}
 		$this->all_ads = $all_ads;
 		return $all_ads;
@@ -672,12 +675,28 @@ class Appnexus_ACM_Provider_Front_End {
 			$tag_type = $this->tag_type;
 			switch ( $tag_type ) {
 				case 'jx':
+					$tags = $tag_id;
+					if ( ! empty( $this->all_ads ) ) {
+						$active_positions = array();
+						foreach ( $this->all_ads as $ad ) {
+							$matching_ad_code = $ad_code_manager->get_matching_ad_code( $ad );
+							if ( ! empty( $matching_ad_code ) ) {
+								array_push( $active_positions, $ad );
+							}
+						}
+						$key = array_search( $tag_id, $this->all_ads );
+						if ( is_int( $key ) ) {
+							$positions = implode( ',', $active_positions );
+							$tags      = $positions . '!' . $tag_id;
+						}
+					}
+
 					$output_html  = '';
 					$output_html .= '<script>
 					<!--
 					var OAS_url = "' . $this->default_url . '";
 					var OAS_sitepage = "MP" + window.location.pathname;
-					var OAS_pos = "' . $tag_id . '";
+					var OAS_pos = "' . $tags . '";
 					var OAS_query = "";
 					var OAS_RN = new String (Math.random());
 					var OAS_RNS = OAS_RN.substring (2,11);';
@@ -685,8 +704,8 @@ class Appnexus_ACM_Provider_Front_End {
 					// --
 					</script>";
 					$output_html .= '<noscript>
-					    <a href="' . $this->default_url . 'click_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tag_id . '">
-					    	<img src="' . $this->default_url . 'adstream_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tag_id . '" border="0">
+					    <a href="' . $this->default_url . 'click_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tags . '">
+					    	<img src="' . $this->default_url . 'adstream_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tags . '" border="0">
 					    </a>
 					</noscript>';
 					break;
