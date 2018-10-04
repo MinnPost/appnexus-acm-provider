@@ -290,7 +290,7 @@ class Appnexus_ACM_Provider_Admin {
 					'items' => array(
 						'jx'  => array(
 							'text'  => 'JX',
-							'value' => 'js',
+							'value' => 'jx',
 						),
 						'mjx' => array(
 							'text'  => 'MJX',

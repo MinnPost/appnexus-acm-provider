@@ -672,6 +672,23 @@ class Appnexus_ACM_Provider_Front_End {
 			$tag_type = $this->tag_type;
 			switch ( $tag_type ) {
 				case 'jx':
+					$output_html  = '';
+					$output_html .= '<script>
+					<!--
+					var OAS_url = "' . $this->default_url . '";
+					var OAS_sitepage = "MP" + window.location.pathname;
+					var OAS_pos = "' . $tag_id . '";
+					var OAS_query = "";
+					var OAS_RN = new String (Math.random());
+					var OAS_RNS = OAS_RN.substring (2,11);';
+					$output_html .= "document.write('<scr' + 'ipt src=\"' + OAS_url + 'adstream_jx.ads/' + OAS_sitepage + '/1' + OAS_RNS + '@' + OAS_pos + '?' + OAS_query + '\">' + '<\/script>');
+					// --
+					</script>";
+					$output_html .= '<noscript>
+					    <a href="' . $this->default_url . 'click_nx.ads' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '@' . $tag_id . '">
+					    	<img src="' . $this->default_url . 'adstream_nx.ads' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '@' . $tag_id . '" border="0">
+					    </a>
+					</noscript>';
 					break;
 				case 'mjx':
 					$output_html = '<script>OAS_AD("' . $tag_id . '");</script>';
