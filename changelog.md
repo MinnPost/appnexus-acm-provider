@@ -3,7 +3,7 @@ Changelog
 
 * 0.0.17 (2018-10-04)
 
-	* Implement the NX ad code type.
+	* Implement the JX ad code type.
 
 * 0.0.16 (2018-09-30)
 
