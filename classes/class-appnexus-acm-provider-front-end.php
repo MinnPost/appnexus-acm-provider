@@ -685,8 +685,8 @@ class Appnexus_ACM_Provider_Front_End {
 					// --
 					</script>";
 					$output_html .= '<noscript>
-					    <a href="' . $this->default_url . 'click_nx.ads' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '@' . $tag_id . '">
-					    	<img src="' . $this->default_url . 'adstream_nx.ads' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '@' . $tag_id . '" border="0">
+					    <a href="' . $this->default_url . 'click_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tag_id . '">
+					    	<img src="' . $this->default_url . 'adstream_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tag_id . '" border="0">
 					    </a>
 					</noscript>';
 					break;
@@ -706,9 +706,9 @@ class Appnexus_ACM_Provider_Front_End {
 					// --
 					</script>";
 					$output_html .= '<noscript>
-					<a href="' . $this->default_url . 'click_nx.ads' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '@' . $tag_id . '">
-						<img src="' . $this->default_url . 'adstream_nx.ads' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '@' . $tag_id . '" border="0" />
-						</a>
+						<a href="' . $this->default_url . 'click_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tag_id . '">
+					    	<img src="' . $this->default_url . 'adstream_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tag_id . '" border="0">
+					    </a>
 						</noscript>';
 					break;
 				case 'sx':
