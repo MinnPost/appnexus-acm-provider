@@ -209,6 +209,15 @@ class Appnexus_ACM_Provider_Front_End {
 				$tag_type = $this->tag_type;
 				switch ( $tag_type ) {
 					case 'jx':
+						$output_html = '
+						<!-- OAS HEADER SETUP begin -->
+						<script>
+						var OAS_url = "' . $this->default_url . '";
+						var OAS_sitepage = "MP" + window.location.pathname;
+						var OAS_RN = new String (Math.random());
+						var OAS_RNS = OAS_RN.substring (2,11);
+						<!-- OAS HEADER SETUP end -->
+						</script>';
 						break;
 					case 'mjx':
 						$output_html = "
@@ -693,13 +702,10 @@ class Appnexus_ACM_Provider_Front_End {
 
 					$output_html  = '';
 					$output_html .= '<script>
-					<!--
-					var OAS_url = "' . $this->default_url . '";
-					var OAS_sitepage = "MP" + window.location.pathname;
-					var OAS_pos = "' . $tags . '";
-					var OAS_query = "";
-					var OAS_RN = new String (Math.random());
-					var OAS_RNS = OAS_RN.substring (2,11);';
+					<!--';
+					$output_html .= '
+						var OAS_pos = "' . $tags . '";
+						var OAS_query = "";';
 					$output_html .= "document.write('<scr' + 'ipt src=\"' + OAS_url + 'adstream_jx.ads/' + OAS_sitepage + '/1' + OAS_RNS + '@' + OAS_pos + '?' + OAS_query + '\">' + '<\/script>');
 					// --
 					</script>";
@@ -883,6 +889,7 @@ class Appnexus_ACM_Provider_Front_End {
 		$tag_type = $this->tag_type;
 		switch ( $tag_type ) {
 			case 'jx':
+				do_action( 'acm_tag', 'appnexus_head' );
 				break;
 			case 'mjx':
 				do_action( 'acm_tag', 'appnexus_head' );
