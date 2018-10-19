@@ -57,7 +57,10 @@ class Appnexus_ACM_Provider_Front_End {
 			$this->default_url = $protocol . $this->default_domain . '/' . $this->server_path . '/';
 		}
 
-		$this->paragraph_end = "\n";
+		$this->paragraph_end = array(
+			false => '</p>',
+			true  => "\n",
+		);
 
 		$this->whitelisted_script_urls = array( $this->default_domain );
 
@@ -543,7 +546,7 @@ class Appnexus_ACM_Provider_Front_End {
 		}
 
 		// If we don't have any paragraphs, let's skip the ads for this post
-		if ( ! stripos( $content, $this->paragraph_end ) ) {
+		if ( ! stripos( $content, $this->paragraph_end[ $in_editor ] ) ) {
 			return true;
 		}
 
@@ -569,7 +572,7 @@ class Appnexus_ACM_Provider_Front_End {
 		$end      = strlen( $content );
 		$position = $end;
 
-		$paragraph_end = $this->paragraph_end;
+		$paragraph_end = $this->paragraph_end[ $in_editor ];
 
 		if ( '1' === $multiple_embeds ) {
 
