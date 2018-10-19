@@ -2,7 +2,7 @@
   "name": "appnexus-acm-provider",
   "title": "Appnexus ACM Provider",
   "description": "",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "main": "index.js",
   "repository": "https://github.com/MinnPost/appnexus-acm-provider.git",
   "author": "MinnPost",
@@ -11,10 +11,10 @@
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",
     "@babel/preset-env": "^7.1.0",
-    "autoprefixer": "^9.1.5",
+    "autoprefixer": "^9.2.1",
     "babel-loader": "^8.0.4",
     "babel-preset-env": "^1.7.0",
-    "browser-sync": "^2.24.7",
+    "browser-sync": "^2.26.3",
     "css-mqpacker": "^7.0.0",
     "del": "^3.0.0",
     "eslint-config-wordpress": "^2.0.0",
@@ -33,7 +33,7 @@
     "gulp-plumber": "^1.2.0",
     "gulp-postcss": "^8.0.0",
     "gulp-rename": "^1.4.0",
-    "gulp-sass": "^4.0.1",
+    "gulp-sass": "^4.0.2",
     "gulp-sass-lint": "^1.4.0",
     "gulp-sort": "~2",
     "gulp-sourcemaps": "^2.6.4",
@@ -43,6 +43,6 @@
     "gulp-util": "~3",
     "gulp-wp-pot": "^2.3.2",
     "npm": "^6.4.1",
-    "webpack": "^4.20.2"
+    "webpack": "^4.21.0"
   }
 }

@@ -1,6 +1,10 @@
 Changelog
 =========
 
+* 0.0.18 (2018-10-19)
+
+	* Stop using `wpautop` to place ads. Use a combination of line breaks as the editor sees the, and a regex to stop undesired HTML tags from being seen as breaks.
+
 * 0.0.17 (2018-10-04)
 
 	* Implement the JX ad code type.

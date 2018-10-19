@@ -57,7 +57,7 @@ class Appnexus_ACM_Provider_Front_End {
 			$this->default_url = $protocol . $this->default_domain . '/' . $this->server_path . '/';
 		}
 
-		$this->paragraph_end = '</p>';
+		$this->paragraph_end = "\n";
 
 		$this->whitelisted_script_urls = array( $this->default_domain );
 
@@ -543,7 +543,7 @@ class Appnexus_ACM_Provider_Front_End {
 		}
 
 		// If we don't have any paragraphs, let's skip the ads for this post
-		if ( ! stripos( wpautop( $content ), $this->paragraph_end ) ) {
+		if ( ! stripos( $content, $this->paragraph_end ) ) {
 			return true;
 		}
 
@@ -583,7 +583,7 @@ class Appnexus_ACM_Provider_Front_End {
 			$end_embed_count   = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
 
 			$paragraphs = [];
-			$split      = explode( $paragraph_end, wpautop( $content ) );
+			$split      = explode( $paragraph_end, $content );
 			foreach ( $split as $paragraph ) {
 				// filter out empty paragraphs
 				if ( strlen( $paragraph ) > 3 ) {
@@ -605,6 +605,10 @@ class Appnexus_ACM_Provider_Front_End {
 						$shortcode = $this->get_code_to_insert( $embed_prefix . (int) $embed_count );
 					} elseif ( true === $in_editor ) {
 						$shortcode = "\n" . '[cms_ad:' . $embed_prefix . (int) $embed_count . ']' . "\n";
+					}
+					$otherblocks = '(?:div|dd|dt|li|pre|fieldset|legend|figcaption|details|thead|tfoot|tr|td)';
+					if ( preg_match( '!(<' . $otherblocks . '[\s/>])!', $paragraphs[ $i ], $m ) ) {
+						continue;
 					}
 					array_splice( $paragraphs, $i + $ad_num, 0, $shortcode );
 					$counter = $insert_every_paragraphs;
