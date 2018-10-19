@@ -607,7 +607,7 @@ class Appnexus_ACM_Provider_Front_End {
 					if ( false === $in_editor ) {
 						$shortcode = $this->get_code_to_insert( $embed_prefix . (int) $embed_count );
 					} elseif ( true === $in_editor ) {
-						$shortcode = "\n" . '[cms_ad:' . $embed_prefix . (int) $embed_count . ']' . "\n";
+						$shortcode = "\n" . '[cms_ad:' . $embed_prefix . (int) $embed_count . ']' . "\n\n";
 					}
 					$otherblocks = '(?:div|dd|dt|li|pre|fieldset|legend|figcaption|details|thead|tfoot|tr|td|style|script|link)';
 					if ( preg_match( '!(<' . $otherblocks . '[\s/>])!', $paragraphs[ $i ], $m ) ) {
@@ -624,8 +624,11 @@ class Appnexus_ACM_Provider_Front_End {
 				$counter--;
 			}
 
-			$content = implode( $paragraph_end, $paragraphs );
-
+			if ( true === $in_editor ) {
+				$content = implode( $paragraph_end, $paragraphs );
+			} else {
+				$content = implode( '', $paragraphs );
+			}
 		} else {
 			$tag_id        = get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
 			$top_offset    = get_option( $this->option_prefix . 'auto_embed_top_offset', 1000 );
@@ -661,7 +664,7 @@ class Appnexus_ACM_Provider_Front_End {
 					$shortcode = $this->get_code_to_insert( $tag_id, 'minnpost-ads-ad-article-middle' );
 				}
 			} else {
-				$shortcode = "\n" . '[cms_ad:' . $tag_id . ']' . "\n";
+				$shortcode = "\n" . '[cms_ad:' . $tag_id . ']' . "\n\n";
 			}
 
 			$content = substr_replace( $content, $shortcode, $position, 0 );
