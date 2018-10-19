@@ -624,7 +624,7 @@ class Appnexus_ACM_Provider_Front_End {
 				$counter--;
 			}
 
-			$content = implode( '', $paragraphs );
+			$content = implode( $paragraph_end, $paragraphs );
 
 		} else {
 			$tag_id        = get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
