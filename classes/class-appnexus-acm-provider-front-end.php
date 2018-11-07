@@ -101,6 +101,25 @@ class Appnexus_ACM_Provider_Front_End {
 		add_filter( 'the_content', array( $this, 'insert_and_render_inline_ads' ), 2000 );
 		add_filter( 'the_content_feed', array( $this, 'insert_and_render_inline_ads' ), 2000 );
 		add_action( 'wp_head', array( $this, 'action_wp_head' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'add_scripts' ) );
+	}
+
+	public function add_scripts() {
+		wp_enqueue_script( 'postscribe', 'https://cdnjs.cloudflare.com/ajax/libs/postscribe/2.0.8/postscribe.min.js', array(), '1.0.0', true );
+		wp_enqueue_script( 'lozad', 'https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js', array( 'postscribe' ), '1.0.0', true );
+		wp_add_inline_script( 'lozad', "var observer = lozad('.lozad', {
+						    load: function(el) {
+						        console.log('loading element ' + el.getAttribute('data-src'));
+						        //el.src = el.getAttribute('data-src');
+						        //loadJS(el.getAttribute('data-src'));
+						        postscribe(el, '<script src=' + el.getAttribute('data-src') + '><\/script>');
+
+						        // Custom implementation to load an element
+						        // e.g. el.src = el.getAttribute('data-src');
+						    }
+						});
+						observer.observe();"
+		);
 	}
 
 	public function store_ad_response() {
@@ -711,14 +730,7 @@ class Appnexus_ACM_Provider_Front_End {
 					}
 
 					$output_html  = '';
-					$output_html .= '<script>
-					<!--';
-					$output_html .= '
-						var OAS_pos = "' . $tags . '";
-						var OAS_query = "";';
-					$output_html .= "document.write('<scr' + 'ipt src=\"' + OAS_url + 'adstream_jx.ads/' + OAS_sitepage + '/1' + OAS_RNS + '@' + OAS_pos + '?' + OAS_query + '\">' + '<\/script>');
-					// --
-					</script>";
+					$output_html .= '<div class="lozad" data-src="' . $this->default_url . 'adstream_jx.ads/MP/' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tags . '"></div>';
 					$output_html .= '<noscript>
 					    <a href="' . $this->default_url . 'click_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tags . '">
 					    	<img src="' . $this->default_url . 'adstream_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tags . '" border="0">
