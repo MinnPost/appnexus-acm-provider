@@ -865,11 +865,11 @@ class Appnexus_ACM_Provider_Front_End {
 				if ( ( $current_embed_count >= $start_embed_count && $current_embed_count <= $end_embed_count ) ) {
 					$use_filter = true;
 				}
-			} else {
-				$auto_embed = get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
-				if ( $auto_embed === $tag_id ) {
-					$use_filter = true;
-				}
+			}
+			// if there is an auto embed ad, we should auto load it also.
+			$auto_embed = get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
+			if ( $auto_embed === $tag_id ) {
+				$use_filter = true;
 			}
 		}
 
