@@ -874,6 +874,7 @@ class Appnexus_ACM_Provider_Front_End {
 		}
 
 		// if the filter is enabled, try to transform the HTML to match lozad's requirements.
+		// I think it might be good to do this with regex.
 		if ( true === $use_filter ) {
 			switch ( $html_tag ) {
 				case 'script':
