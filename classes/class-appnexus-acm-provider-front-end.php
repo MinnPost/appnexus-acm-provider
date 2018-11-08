@@ -101,22 +101,36 @@ class Appnexus_ACM_Provider_Front_End {
 		add_filter( 'the_content', array( $this, 'insert_and_render_inline_ads' ), 2000 );
 		add_filter( 'the_content_feed', array( $this, 'insert_and_render_inline_ads' ), 2000 );
 		add_action( 'wp_head', array( $this, 'action_wp_head' ) );
+
+		// add javascript
 		add_action( 'wp_enqueue_scripts', array( $this, 'add_scripts' ) );
 	}
 
+	/**
+	* Enqueue JavaScript libraries for front end
+	*
+	*/
 	public function add_scripts() {
 		wp_enqueue_script( 'postscribe', 'https://cdnjs.cloudflare.com/ajax/libs/postscribe/2.0.8/postscribe.min.js', array(), '1.0.0', true );
 		wp_enqueue_script( 'polyfill', plugins_url( 'assets/js/intersection-observer.min.js', dirname( __FILE__ ) ), array(), '1.0.0', true );
 		wp_enqueue_script( 'lozad', 'https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js', array( 'postscribe', 'polyfill' ), '1.0.0', true );
-		wp_add_inline_script( 'lozad', "var observer = lozad('.lozad', {
-						    load: function(el) {
-						        postscribe(el, '<script src=' + el.getAttribute('data-src') + '><\/script>');
-						    }
-						});
-						observer.observe();"
+		wp_add_inline_script( 'lozad', "
+			var observer = lozad('.lozad', {
+				rootMargin: '150px 0px',
+			    load: function(el) {
+			        postscribe(el, '<script src=' + el.getAttribute('data-src') + '><\/script>');
+			    }
+			});
+			observer.observe();
+			"
 		);
 	}
 
+	/**
+	* This method can cache the response from the DX ads.
+	* This method is apparently not usable in production yet.
+	*
+	*/
 	public function store_ad_response() {
 		$all_ads = array();
 
@@ -820,6 +834,7 @@ class Appnexus_ACM_Provider_Front_End {
 	 * @param string $output_html    The non lazy loaded html
 	 * @param string $tag_id         The ad tag id
 	 * @param bool $check_html       Whether to check the html contents before trying to lazy load them
+	 * @param string $html_tag       What HTML tag we're dealing with here.
 	 *
 	 * @return $output_html          The ad html, lazy loaded if applicable
 	 *
@@ -855,6 +870,7 @@ class Appnexus_ACM_Provider_Front_End {
 			}
 		}
 
+		// if the filter is enabled, try to transform the HTML to match lozad's requirements.
 		if ( true === $use_filter ) {
 			switch ( $html_tag ) {
 				case 'script':
@@ -869,6 +885,7 @@ class Appnexus_ACM_Provider_Front_End {
 			}
 		}
 
+		// if output_html is currently an array, implode the parts we use into a string
 		if ( is_array( $output_html ) ) {
 			$output_html = implode( '', array( $output_html['script'], $output_html['noscript'] ) );
 		}
