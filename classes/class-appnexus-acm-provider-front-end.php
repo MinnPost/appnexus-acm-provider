@@ -111,19 +111,21 @@ class Appnexus_ACM_Provider_Front_End {
 	*
 	*/
 	public function add_scripts() {
-		wp_enqueue_script( 'postscribe', 'https://cdnjs.cloudflare.com/ajax/libs/postscribe/2.0.8/postscribe.min.js', array(), '1.0.0', true );
-		wp_enqueue_script( 'polyfill', plugins_url( 'assets/js/intersection-observer.min.js', dirname( __FILE__ ) ), array(), '1.0.0', true );
-		wp_enqueue_script( 'lozad', 'https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js', array( 'postscribe', 'polyfill' ), '1.0.0', true );
-		wp_add_inline_script( 'lozad', "
-			var observer = lozad('.lozad', {
-				rootMargin: '150px 0px',
-			    load: function(el) {
-			        postscribe(el, '<script src=' + el.getAttribute('data-src') + '><\/script>');
-			    }
-			});
-			observer.observe();
-			"
-		);
+		if ( '1' === $this->lazy_load_all || '1' === $this->lazy_load_embeds ) {
+			wp_enqueue_script( 'postscribe', 'https://cdnjs.cloudflare.com/ajax/libs/postscribe/2.0.8/postscribe.min.js', array(), '1.0.0', true );
+			wp_enqueue_script( 'polyfill', plugins_url( 'assets/js/intersection-observer.min.js', dirname( __FILE__ ) ), array(), '1.0.0', true );
+			wp_enqueue_script( 'lozad', 'https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js', array( 'postscribe', 'polyfill' ), '1.0.0', true );
+			wp_add_inline_script( 'lozad', "
+				var observer = lozad('.lozad', {
+					rootMargin: '150px 0px',
+				    load: function(el) {
+				        postscribe(el, '<script src=' + el.getAttribute('data-src') + '><\/script>');
+				    }
+				});
+				observer.observe();
+				"
+			);
+		}
 	}
 
 	/**
@@ -841,6 +843,7 @@ class Appnexus_ACM_Provider_Front_End {
 	 */
 	private function lazy_loaded_html_or_not( $output_html, $tag_id, $check_html = false, $html_tag = 'img' ) {
 		// lazy load everything
+		$use_filter = false;
 		if ( '1' === $this->lazy_load_all ) {
 			$use_filter = true;
 		} elseif ( '1' === $this->lazy_load_embeds ) {
