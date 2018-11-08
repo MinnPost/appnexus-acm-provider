@@ -112,9 +112,9 @@ class Appnexus_ACM_Provider_Front_End {
 	*/
 	public function add_scripts() {
 		if ( '1' === $this->lazy_load_all || '1' === $this->lazy_load_embeds ) {
-			wp_enqueue_script( 'postscribe', 'https://cdnjs.cloudflare.com/ajax/libs/postscribe/2.0.8/postscribe.min.js', array(), '1.0.0', true );
-			wp_enqueue_script( 'polyfill', plugins_url( 'assets/js/intersection-observer.min.js', dirname( __FILE__ ) ), array(), '1.0.0', true );
-			wp_enqueue_script( 'lozad', 'https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js', array( 'postscribe', 'polyfill' ), '1.0.0', true );
+			wp_enqueue_script( 'postscribe', 'https://cdnjs.cloudflare.com/ajax/libs/postscribe/2.0.8/postscribe.min.js', array(), '2.0.8', true );
+			wp_enqueue_script( 'polyfill', plugins_url( 'assets/js/intersection-observer.min.js', dirname( __FILE__ ) ), array(), $this->version, true );
+			wp_enqueue_script( 'lozad', 'https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js', array( 'postscribe', 'polyfill' ), '1.6.0', true );
 			wp_add_inline_script( 'lozad', "
 				var observer = lozad('.lozad', {
 					rootMargin: '150px 0px',
