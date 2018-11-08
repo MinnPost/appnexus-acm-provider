@@ -739,7 +739,7 @@ class Appnexus_ACM_Provider_Front_End {
 					}
 
 					$output_html             = array();
-					$output_html['url']      = $this->default_url . 'adstream_jx.ads/MP/' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tags;
+					$output_html['url']      = $this->default_url . 'adstream_jx.ads/MP/' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . $tags;
 					$output_html['script']   = '<script>
 					<!--';
 					$output_html['script']  .= '
@@ -749,8 +749,8 @@ class Appnexus_ACM_Provider_Front_End {
 					// --
 					</script>";
 					$output_html['noscript'] = '<noscript>
-					    <a href="' . $this->default_url . 'click_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tags . '">
-					    	<img src="' . $this->default_url . 'adstream_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tags . '" border="0">
+					    <a href="' . $this->default_url . 'click_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . $tags . '">
+					    	<img src="' . $this->default_url . 'adstream_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . $tags . '" border="0">
 					    </a>
 					</noscript>';
 					$output_html             = $this->lazy_loaded_html_or_not( $output_html, $tag_id, true, 'script' );
@@ -771,14 +771,14 @@ class Appnexus_ACM_Provider_Front_End {
 					// --
 					</script>";
 					$output_html .= '<noscript>
-						<a href="' . $this->default_url . 'click_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tag_id . '">
-					    	<img src="' . $this->default_url . 'adstream_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tag_id . '" border="0">
+						<a href="' . $this->default_url . 'click_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . $tag_id . '">
+					    	<img src="' . $this->default_url . 'adstream_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . $tag_id . '" border="0">
 					    </a>
 						</noscript>';
 					break;
 				case 'sx':
 					$not_tags    = implode( ',', array_column( $ad_tags, 'tag' ) );
-					$output_html = '<iframe src="' . $this->default_url . 'adstream_sx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $not_tags . '!' . $tag_id . '?_RM_IP_=' . $_SERVER['REMOTE_ADDR'] . '" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>';
+					$output_html = '<iframe src="' . $this->default_url . 'adstream_sx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . $not_tags . '!' . $tag_id . '?_RM_IP_=' . $_SERVER['REMOTE_ADDR'] . '" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>';
 					$output_html = $this->lazy_loaded_html_or_not( $output_html, $tag_id );
 					break;
 				case 'dx':
