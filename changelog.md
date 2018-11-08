@@ -1,6 +1,10 @@
 Changelog
 =========
 
+* 0.0.19 (2018-11-08)
+
+	* Begin support for lazy loading of JX ad codes using the Lozad library and the IntersectionObserver polyfill.
+
 * 0.0.18 (2018-10-19)
 
 	* Stop using `wpautop` to place ads. Use a combination of line breaks as the editor sees the, and a regex to stop undesired HTML tags from being seen as breaks.

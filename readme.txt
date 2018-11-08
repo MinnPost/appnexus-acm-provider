@@ -4,7 +4,7 @@ Donate link: https://www.minnpost.com/support/?campaign=7010G0000012fXGQAY
 Tags: ads, ad code manager, appnexus
 Requires at least: 4.9
 Tested up to: 4.9
-Stable tag: 0.0.18
+Stable tag: 0.0.19
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,6 +23,14 @@ In the Plugins list in WordPress, activate the plugin and find the settings link
 The plugin's settings URL is `https://<your site>/wp-admin/options-general.php?page=appnexus-acm-provider`. Ad codes appear in the Ad Code Manager's interface at `https://<your site>/wp-admin/tools.php?page=ad-code-manager`.
 
 == Changelog ==
+
+* 0.0.19 (2018-11-08)
+
+	* Begin support for lazy loading of JX ad codes using the Lozad library and the IntersectionObserver polyfill.
+
+* 0.0.18 (2018-10-19)
+
+	* Stop using `wpautop` to place ads. Use a combination of line breaks as the editor sees the, and a regex to stop undesired HTML tags from being seen as breaks.
 
 * 0.0.17 (2018-10-04)
 
