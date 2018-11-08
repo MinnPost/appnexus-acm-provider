@@ -724,13 +724,22 @@ class Appnexus_ACM_Provider_Front_End {
 						}
 					}
 
-					$output_html  = '';
-					$output_html .= '<div class="lozad" data-src="' . $this->default_url . 'adstream_jx.ads/MP/' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tags . '"></div>';
-					$output_html .= '<noscript>
+					$output_html             = array();
+					$output_html['url']      = $this->default_url . 'adstream_jx.ads/MP/' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tags;
+					$output_html['script']   = '<script>
+					<!--';
+					$output_html['script']  .= '
+						var OAS_pos = "' . $tags . '";
+						var OAS_query = "";';
+					$output_html['script']  .= "document.write('<scr' + 'ipt src=\"' + OAS_url + 'adstream_jx.ads/' + OAS_sitepage + '/1' + OAS_RNS + '@' + OAS_pos + '?' + OAS_query + '\">' + '<\/script>');
+					// --
+					</script>";
+					$output_html['noscript'] = '<noscript>
 					    <a href="' . $this->default_url . 'click_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tags . '">
 					    	<img src="' . $this->default_url . 'adstream_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . mt_rand() . '@' . $tags . '" border="0">
 					    </a>
 					</noscript>';
+					$output_html             = $this->lazy_loaded_html_or_not( $output_html, $tag_id, true, 'script' );
 					break;
 				case 'mjx':
 					$output_html = '<script>OAS_AD("' . $tag_id . '");</script>';
@@ -815,85 +824,53 @@ class Appnexus_ACM_Provider_Front_End {
 	 * @return $output_html          The ad html, lazy loaded if applicable
 	 *
 	 */
-	private function lazy_loaded_html_or_not( $output_html, $tag_id, $check_html = false ) {
-
-		// check for easy lazy load filter
-		if ( array_key_exists( 'easy_lazy_loader_html', $GLOBALS['wp_filter'] ) ) {
-
+	private function lazy_loaded_html_or_not( $output_html, $tag_id, $check_html = false, $html_tag = 'img' ) {
+		// lazy load everything
+		if ( '1' === $this->lazy_load_all ) {
 			$use_filter = true;
+		} elseif ( '1' === $this->lazy_load_embeds ) {
+			$use_filter = false; // we only want to lazy load the embeds, so set it to true when necessary
+			// lazy load embeds only
+			$multiple_embeds = get_option( $this->option_prefix . 'multiple_embeds', '0' );
+			if ( is_array( $multiple_embeds ) ) {
+				$multiple_embeds = $multiple_embeds[0];
+			}
 
-			if ( true === $check_html ) {
-				$use_filter = false; // if we have to check the html, don't use the filter unless it matches
-				$has_image  = false;
-				$has_iframe = false;
-				$has_video  = false;
-				$has_audio  = false;
-
-				if ( false !== stripos( $output_html, '<img' ) && false === stripos( $output_html, '<noscript' ) ) {
-					$has_image = true;
-				}
-				if ( false !== stripos( $output_html, '<iframe' ) ) {
-					$has_iframe = true;
-				}
-				if ( false !== stripos( $output_html, '<video' ) ) {
-					$has_video = true;
-				}
-				if ( false !== stripos( $output_html, '<audio' ) ) {
-					$has_audio = true;
-				}
-
-				// maybe lazy load
-				$lazy_load_options = get_option( 'easylazyloader_options', array() );
-				if ( true === $has_image && (bool) 1 === $lazy_load_options['lazy_load_images'] ) {
+			// if multiples are enabled, check to see if the id is in the embed tag range
+			if ( '1' === $multiple_embeds ) {
+				$embed_prefix        = get_option( $this->option_prefix . 'embed_prefix', 'x' );
+				$start_embed_id      = get_option( $this->option_prefix . 'start_tag_id', 'x100' );
+				$start_embed_count   = intval( str_replace( $embed_prefix, '', $start_embed_id ) ); // ex 100
+				$end_embed_id        = get_option( $this->option_prefix . 'end_tag_id', 'x110' );
+				$end_embed_count     = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
+				$current_embed_count = intval( str_replace( $embed_prefix, '', $tag_id ) ); // ex 108
+				if ( ( $current_embed_count >= $start_embed_count && $current_embed_count <= $end_embed_count ) ) {
 					$use_filter = true;
 				}
-				if ( true === $has_iframe && (bool) 1 === $lazy_load_options['lazy_load_iframes'] ) {
-					$use_filter = true;
-				}
-				if ( true === $has_video && (bool) 1 === $lazy_load_options['lazy_load_videos'] ) {
-					$use_filter = true;
-				}
-				if ( true === $has_audio && (bool) 1 === $lazy_load_options['lazy_load_audios'] ) {
+			} else {
+				$auto_embed = get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
+				if ( $auto_embed === $tag_id ) {
 					$use_filter = true;
 				}
 			}
+		}
 
-			if ( false === $use_filter ) {
-				return $output_html;
+		if ( true === $use_filter ) {
+			switch ( $html_tag ) {
+				case 'script':
+					$output_html['script'] = '<div class="lozad" data-src="' . $output_html['url'] . '"></div>';
+					break;
+				case 'img':
+					$output_html = str_replace( '<img src=', '<img class="lozad data-src=', $output_html );
+					break;
+				default:
+					$output_html = $output_html;
+					break;
 			}
+		}
 
-			// lazy load everything
-			if ( '1' === $this->lazy_load_all ) {
-				$use_filter = true;
-			} elseif ( '1' === $this->lazy_load_embeds ) {
-				$use_filter = false; // we only want to lazy load the embeds, so set it to true when necessary
-				// lazy load embeds only
-				$multiple_embeds = get_option( $this->option_prefix . 'multiple_embeds', '0' );
-				if ( is_array( $multiple_embeds ) ) {
-					$multiple_embeds = $multiple_embeds[0];
-				}
-
-				// if multiples are enabled, check to see if the id is in the embed tag range
-				if ( '1' === $multiple_embeds ) {
-					$embed_prefix        = get_option( $this->option_prefix . 'embed_prefix', 'x' );
-					$start_embed_id      = get_option( $this->option_prefix . 'start_tag_id', 'x100' );
-					$start_embed_count   = intval( str_replace( $embed_prefix, '', $start_embed_id ) ); // ex 100
-					$end_embed_id        = get_option( $this->option_prefix . 'end_tag_id', 'x110' );
-					$end_embed_count     = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
-					$current_embed_count = intval( str_replace( $embed_prefix, '', $tag_id ) ); // ex 108
-					if ( ( $current_embed_count > $start_embed_count && $current_embed_count < $end_embed_count ) ) {
-						$use_filter = true;
-					}
-				} else {
-					$auto_embed = get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
-					if ( $auto_embed === $tag_id ) {
-						$use_filter = true;
-					}
-				}
-			}
-			if ( true === $use_filter ) {
-				$output_html = apply_filters( 'easy_lazy_loader_html', $output_html );
-			}
+		if ( is_array( $output_html ) ) {
+			$output_html = implode( '', array( $output_html['script'], $output_html['noscript'] ) );
 		}
 
 		return $output_html;
