@@ -1,6 +1,10 @@
 Changelog
 =========
 
+* 0.0.20 (2018-11-09)
+
+	* Use filters from separate WP Lozad Lazyload plugin to lazy load ads.
+
 * 0.0.19 (2018-11-08)
 
 	* Begin support for lazy loading of JX ad codes using the Lozad library and the IntersectionObserver polyfill.
