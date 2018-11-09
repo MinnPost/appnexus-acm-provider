@@ -103,21 +103,18 @@ class Appnexus_ACM_Provider_Front_End {
 		add_action( 'wp_head', array( $this, 'action_wp_head' ) );
 
 		// add javascript
-		add_action( 'wp_enqueue_scripts', array( $this, 'add_scripts' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'add_scripts' ), 20 );
 	}
 
 	/**
-	* Enqueue JavaScript libraries for front end
+	* Enqueue JavaScript for front end
 	*
 	*/
 	public function add_scripts() {
 		if ( '1' === $this->lazy_load_all || '1' === $this->lazy_load_embeds ) {
-			wp_enqueue_script( 'postscribe', 'https://cdnjs.cloudflare.com/ajax/libs/postscribe/2.0.8/postscribe.min.js', array(), '2.0.8', true );
-			wp_enqueue_script( 'polyfill', plugins_url( 'assets/js/intersection-observer.min.js', dirname( __FILE__ ) ), array(), $this->version, true );
-			wp_enqueue_script( 'lozad', 'https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js', array( 'postscribe', 'polyfill' ), '1.6.0', true );
 			wp_add_inline_script( 'lozad', "
 				var observer = lozad('.lozad', {
-					rootMargin: '150px 0px',
+					rootMargin: '300px 0px',
 				    load: function(el) {
 				        postscribe(el, '<script src=' + el.getAttribute('data-src') + '><\/script>');
 				    }
@@ -740,11 +737,14 @@ class Appnexus_ACM_Provider_Front_End {
 						}
 					}
 
+					$params = array(
+						'html_tag' => 'script',
+						'url'      => $this->default_url . 'adstream_jx.ads/MP/' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . $tags,
+					);
+
 					$output_html             = array();
-					$output_html['url']      = $this->default_url . 'adstream_jx.ads/MP/' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . $tags;
 					$output_html['script']   = '<script>
-					<!--';
-					$output_html['script']  .= '
+					<!--
 						var OAS_pos = "' . $tags . '";
 						var OAS_query = "";';
 					$output_html['script']  .= "document.write('<scr' + 'ipt src=\"' + OAS_url + 'adstream_jx.ads/' + OAS_sitepage + '/1' + OAS_RNS + '@' + OAS_pos + '?' + OAS_query + '\">' + '<\/script>');
@@ -755,33 +755,40 @@ class Appnexus_ACM_Provider_Front_End {
 					    	<img src="' . $this->default_url . 'adstream_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . $tags . '" border="0">
 					    </a>
 					</noscript>';
-					$output_html             = $this->lazy_loaded_html_or_not( $output_html, $tag_id, true, 'script' );
+					$output_html             = $this->lazy_loaded_html_or_not( $output_html, $tag_id, $params );
 					break;
 				case 'mjx':
 					$output_html = '<script>OAS_AD("' . $tag_id . '");</script>';
 					break;
 				case 'nx':
-					$output_html  = '';
-					$output_html .= '<script>
+					$params = array(
+						'html_tag' => 'script',
+						'url'      => $this->default_url . 'adstream_jx.ads/MP/' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . $tags,
+					);
+
+					$output_html             = array();
+					$output_html['script']   = '<script>
 					<!--
-					OAS_url = "' . $this->default_domain . '";
-					OAS_sitepage = "' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '";
-					OAS_pos = "' . $tag_id . '";';
-					//OAS_query = 'Keyword';
-					$output_html .= 'var OAS_rns = (Math.random() + \"\").substring(2, 11);';
-					$output_html .= "document.write('<scr' + 'ipt src=\"' + OAS_url + '/$this->server_path/adstream_jx.ads/' + OAS_sitepage + '/1' + OAS_RNS + '@' + OAS_pos + '?' + OAS_query + '\"></scr' + 'ipt>');
+						var OAS_pos = "' . $tag_id . '";
+						var OAS_query = "";';
+					$output_html['script']  .= "document.write('<scr' + 'ipt src=\"' + OAS_url + 'adstream_jx.ads/' + OAS_sitepage + '/1' + OAS_RNS + '@' + OAS_pos + '?' + OAS_query + '\">' + '<\/script>');
 					// --
 					</script>";
-					$output_html .= '<noscript>
+					$output_html['noscript'] = '<noscript>
 						<a href="' . $this->default_url . 'click_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . $tag_id . '">
 					    	<img src="' . $this->default_url . 'adstream_nx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . $tag_id . '" border="0">
 					    </a>
 						</noscript>';
+						$output_html         = $this->lazy_loaded_html_or_not( $output_html, $tag_id, $params );
 					break;
 				case 'sx':
+					$params = array(
+						'html_tag' => 'iframe',
+					);
+
 					$not_tags    = implode( ',', array_column( $ad_tags, 'tag' ) );
 					$output_html = '<iframe src="' . $this->default_url . 'adstream_sx.ads/MP' . strtok( $_SERVER['REQUEST_URI'], '?' ) . '1' . $this->random_number . '@' . $not_tags . '!' . $tag_id . '?_RM_IP_=' . $_SERVER['REMOTE_ADDR'] . '" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>';
-					$output_html = $this->lazy_loaded_html_or_not( $output_html, $tag_id );
+					$output_html = $this->lazy_loaded_html_or_not( $output_html, $tag_id, $params );
 					break;
 				case 'dx':
 					$output_html     = '';
@@ -796,7 +803,7 @@ class Appnexus_ACM_Provider_Front_End {
 							// add the impression tracker
 							$impression_html = '<img class="appnexus-ad-impression" src="' . $this->all_ads['Ad'][ $key ]['ImpUrl'] . '" style="width: 1px; height: 1px; position: absolute; visibility: hidden;">';
 
-							$ad_html         = $this->lazy_loaded_html_or_not( $ad_html, $tag_id, true );
+							$ad_html         = $this->lazy_loaded_html_or_not( $ad_html, $tag_id );
 							$impression_html = $this->lazy_loaded_html_or_not( $impression_html, $tag_id );
 
 							$output_html = $ad_html . $impression_html;
@@ -809,16 +816,6 @@ class Appnexus_ACM_Provider_Front_End {
 
 			$output_html = '<div class="appnexus-ad ad-' . sanitize_title( $tag_id ) . '">' . $output_html . '</div>';
 
-			/*if ( 4 === strlen( $tag_id ) && 0 === strpos( $tag_id, 'x10' ) ) {
-				$output_html = '
-					<div class="appnexus-ad ad-' . sanitize_title( $tag_id ) . '">
-						<code><!--
-						OAS_AD("' . $tag_id . '");
-						//-->
-						</code>
-					</div>
-				';
-			}*/
 		}
 		// use the function we already have for the placeholder ad
 		if ( function_exists( 'acm_no_ad_users' ) ) {
@@ -841,55 +838,46 @@ class Appnexus_ACM_Provider_Front_End {
 	 * @return $output_html          The ad html, lazy loaded if applicable
 	 *
 	 */
-	private function lazy_loaded_html_or_not( $output_html, $tag_id, $check_html = false, $html_tag = 'img' ) {
-		// lazy load everything
+	private function lazy_loaded_html_or_not( $output_html, $tag_id, $params = array() ) {
+		// check for lazy load filter
 		$use_filter = false;
-		if ( '1' === $this->lazy_load_all ) {
-			$use_filter = true;
-		} elseif ( '1' === $this->lazy_load_embeds ) {
-			$use_filter = false; // we only want to lazy load the embeds, so set it to true when necessary
-			// lazy load embeds only
-			$multiple_embeds = get_option( $this->option_prefix . 'multiple_embeds', '0' );
-			if ( is_array( $multiple_embeds ) ) {
-				$multiple_embeds = $multiple_embeds[0];
-			}
+		if ( array_key_exists( 'wp_lozad_lazyload_convert_html', $GLOBALS['wp_filter'] ) ) {
+			if ( '1' === $this->lazy_load_all ) {
+				$use_filter = true;
+			} elseif ( '1' === $this->lazy_load_embeds ) {
+				$use_filter = false; // we only want to lazy load the embeds, so set it to true when necessary
+				// lazy load embeds only
+				$multiple_embeds = get_option( $this->option_prefix . 'multiple_embeds', '0' );
+				if ( is_array( $multiple_embeds ) ) {
+					$multiple_embeds = $multiple_embeds[0];
+				}
 
-			// if multiples are enabled, check to see if the id is in the embed tag range
-			if ( '1' === $multiple_embeds ) {
-				$embed_prefix        = get_option( $this->option_prefix . 'embed_prefix', 'x' );
-				$start_embed_id      = get_option( $this->option_prefix . 'start_tag_id', 'x100' );
-				$start_embed_count   = intval( str_replace( $embed_prefix, '', $start_embed_id ) ); // ex 100
-				$end_embed_id        = get_option( $this->option_prefix . 'end_tag_id', 'x110' );
-				$end_embed_count     = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
-				$current_embed_count = intval( str_replace( $embed_prefix, '', $tag_id ) ); // ex 108
-				if ( ( $current_embed_count >= $start_embed_count && $current_embed_count <= $end_embed_count ) ) {
+				// if multiples are enabled, check to see if the id is in the embed tag range
+				if ( '1' === $multiple_embeds ) {
+					$embed_prefix        = get_option( $this->option_prefix . 'embed_prefix', 'x' );
+					$start_embed_id      = get_option( $this->option_prefix . 'start_tag_id', 'x100' );
+					$start_embed_count   = intval( str_replace( $embed_prefix, '', $start_embed_id ) ); // ex 100
+					$end_embed_id        = get_option( $this->option_prefix . 'end_tag_id', 'x110' );
+					$end_embed_count     = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
+					$current_embed_count = intval( str_replace( $embed_prefix, '', $tag_id ) ); // ex 108
+					if ( ( $current_embed_count >= $start_embed_count && $current_embed_count <= $end_embed_count ) ) {
+						$use_filter = true;
+					}
+				}
+				// if there is an auto embed ad, we should auto load it also.
+				$auto_embed = get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
+				if ( $auto_embed === $tag_id ) {
 					$use_filter = true;
 				}
 			}
-			// if there is an auto embed ad, we should auto load it also.
-			$auto_embed = get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
-			if ( $auto_embed === $tag_id ) {
-				$use_filter = true;
+
+			// if the filter is enabled, try to transform the HTML to match lozad's requirements.
+			if ( true === $use_filter ) {
+				$output_html = apply_filters( 'wp_lozad_lazyload_convert_html', $output_html, $params );
 			}
 		}
 
-		// if the filter is enabled, try to transform the HTML to match lozad's requirements.
-		// I think it might be good to do this with regex.
-		if ( true === $use_filter ) {
-			switch ( $html_tag ) {
-				case 'script':
-					$output_html['script'] = '<div class="lozad" data-src="' . $output_html['url'] . '"></div>';
-					break;
-				case 'img':
-					$output_html = str_replace( '<img src=', '<img class="lozad data-src=', $output_html );
-					break;
-				default:
-					$output_html = $output_html;
-					break;
-			}
-		}
-
-		// if output_html is currently an array, implode the parts we use into a string
+		// if output_html is returned as an array, implode the parts we use into a string
 		if ( is_array( $output_html ) ) {
 			$output_html = implode( '', array( $output_html['script'], $output_html['noscript'] ) );
 		}
