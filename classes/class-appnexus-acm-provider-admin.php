@@ -333,17 +333,19 @@ class Appnexus_ACM_Provider_Admin {
 			),
 		);
 
-		$settings['lazy_load_ads'] = array(
-			'title'    => __( 'Lazy load all ads?', 'appnexus-acm-provider' ),
-			'callback' => $callbacks['text'],
-			'page'     => $page,
-			'section'  => $section,
-			'args'     => array(
-				'type'    => 'checkbox',
-				'desc'    => 'Load each ad when the user scrolls near it, regardless of its placement. You can also choose to lazy load only embed ads.',
-				'default' => '0',
-			),
-		);
+		if ( array_key_exists( 'wp_lozad_lazyload_convert_html', $GLOBALS['wp_filter'] ) ) {
+			$settings['lazy_load_ads'] = array(
+				'title'    => __( 'Lazy load all ads?', 'appnexus-acm-provider' ),
+				'callback' => $callbacks['text'],
+				'page'     => $page,
+				'section'  => $section,
+				'args'     => array(
+					'type'    => 'checkbox',
+					'desc'    => 'Load each ad when the user scrolls near it, regardless of its placement. You can also choose to lazy load only embed ads.',
+					'default' => '0',
+				),
+			);
+		}
 
 		foreach ( $settings as $key => $attributes ) {
 			$id       = $this->option_prefix . $key;
@@ -487,17 +489,6 @@ class Appnexus_ACM_Provider_Admin {
 						),
 					),
 				);
-				$embed_settings['lazy_load_embeds'] = array(
-					'title'    => __( 'Lazy load embed ads?', 'appnexus-acm-provider' ),
-					'callback' => $callbacks['text'],
-					'page'     => $page,
-					'section'  => $section,
-					'args'     => array(
-						'type'    => 'checkbox',
-						'desc'    => 'If checked, the ad inserter will lazy load embed ads, even if it is not set to lazy load all the other ads.',
-						'default' => '',
-					),
-				);
 			} elseif ( 'multiple_off' === $key ) {
 				$embed_settings = array(
 					'auto_embed_position'      => array(
@@ -589,6 +580,21 @@ class Appnexus_ACM_Provider_Admin {
 					),
 				);
 			}
+
+			if ( array_key_exists( 'wp_lozad_lazyload_convert_html', $GLOBALS['wp_filter'] ) ) {
+				$embed_settings['lazy_load_embeds'] = array(
+					'title'    => __( 'Lazy load embed ads?', 'appnexus-acm-provider' ),
+					'callback' => $callbacks['text'],
+					'page'     => $page,
+					'section'  => $section,
+					'args'     => array(
+						'type'    => 'checkbox',
+						'desc'    => 'If checked, the ad inserter will lazy load embed ads, even if it is not set to lazy load all the other ads.',
+						'default' => '',
+					),
+				);
+			}
+
 			foreach ( $embed_settings as $key => $attributes ) {
 				$id       = $this->option_prefix . $key;
 				$name     = $this->option_prefix . $key;
