@@ -869,6 +869,10 @@ class Appnexus_ACM_Provider_Front_End {
 				if ( $auto_embed === $tag_id ) {
 					$use_filter = true;
 				}
+
+				if ( ! is_singular() ) {
+					$use_filter = false;
+				} // if we're only supposed to lazy load embeds, don't do it unless this is a singular post
 			}
 
 			// if the filter is enabled, try to transform the HTML to match lozad's requirements.
