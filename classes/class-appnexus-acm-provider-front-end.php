@@ -59,7 +59,7 @@ class Appnexus_ACM_Provider_Front_End {
 
 		$this->paragraph_end = array(
 			false => '</p>',
-			true  => "\n",
+			true  => "</p>",
 		);
 
 		$this->whitelisted_script_urls = array( $this->default_domain );
@@ -613,13 +613,6 @@ class Appnexus_ACM_Provider_Front_End {
 			$end_embed_count   = intval( str_replace( $embed_prefix, '', $end_embed_id ) ); // ex 110
 
 			$paragraphs = [];
-			$split      = explode( $paragraph_end, $content );
-			foreach ( $split as $paragraph ) {
-				// filter out empty paragraphs
-				if ( strlen( $paragraph ) > 3 ) {
-					$paragraphs[] = $paragraph . $paragraph_end;
-				}
-			}
 
 			$paragraph_count = count( $paragraphs );
 			$maximum_ads     = floor( ( $paragraph_count - $minimum_paragraph_count ) / $insert_every_paragraphs ) + $minimum_paragraph_count;
@@ -628,7 +621,48 @@ class Appnexus_ACM_Provider_Front_End {
 			$counter     = $minimum_paragraph_count;
 			$embed_count = $start_embed_count;
 
-			for ( $i = 0; $i < $paragraph_count; $i++ ) {
+			$dom = new DOMDocument( null, 'UTF-8' );
+			// @codingStandardsIgnoreStart
+			@$dom->loadHTML( mb_convert_encoding( wpautop( $content ), 'HTML-ENTITIES', 'UTF-8' ) );
+			foreach ( $dom->getElementsByTagName('body')->item(0)->childNodes as $key => $node ) {
+				if ( 'p' !== $node->nodeName ) {
+					continue;
+				} else {
+					// populate the noscript element
+					//$test = $dom->createElement( 'hr', '' );
+					// @codingStandardsIgnoreStart
+					//$node->parentNode->insertBefore( $test, $node );
+					// @codingStandardsIgnoreEnd
+					//$noscript->appendChild( $fallback );
+					if ( 0 === $counter && $embed_count <= $end_embed_count ) {
+						// make a shortcode using the number of the shorcode that will be added.
+						if ( false === $in_editor ) {
+							$shortcode = $this->get_code_to_insert( $embed_prefix . (int) $embed_count );
+						} elseif ( true === $in_editor ) {
+							$shortcode = "\n" . '[cms_ad:' . $embed_prefix . (int) $embed_count . ']' . "\n\n";
+						}
+						array_splice( $paragraphs, $key + $ad_num, 0, $shortcode );
+						$counter = $insert_every_paragraphs;
+						$ad_num++;
+						if ( $ad_num > $maximum_ads ) {
+							break;
+						}
+						$embed_count++;
+					}
+					$counter--;
+					if ( isset( $shortcode ) ) {
+						$ad = $dom->createElement( 'div', '' );
+						$ad_text = $dom->createTextNode( $shortcode );
+						$ad->appendChild( $ad_text );
+						$node->parentNode->insertBefore( $ad, $node );
+					}
+				}
+			}
+
+			// save the html
+			$content = preg_replace( '/^<!DOCTYPE.+?>/', '', str_replace( array( '<html>', '</html>', '<body>', '</body>' ), array( '', '', '', '' ), $dom->saveHTML() ) );
+
+			/*for ( $i = 0; $i < $paragraph_count; $i++ ) {
 				if ( 0 === $counter && $embed_count <= $end_embed_count ) {
 					// make a shortcode using the number of the shorcode that will be added.
 					if ( false === $in_editor ) {
@@ -649,13 +683,13 @@ class Appnexus_ACM_Provider_Front_End {
 					$embed_count++;
 				}
 				$counter--;
-			}
+			}*/
 
-			if ( true === $in_editor ) {
+			/*if ( true === $in_editor ) {
 				$content = implode( $paragraph_end, $paragraphs );
 			} else {
 				$content = implode( '', $paragraphs );
-			}
+			}*/
 		} else {
 			$tag_id        = get_option( $this->option_prefix . 'auto_embed_position', 'Middle' );
 			$top_offset    = get_option( $this->option_prefix . 'auto_embed_top_offset', 1000 );
