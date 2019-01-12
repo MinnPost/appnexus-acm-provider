@@ -113,13 +113,17 @@ class Appnexus_ACM_Provider_Front_End {
 	public function add_scripts() {
 		if ( '1' === $this->lazy_load_all || '1' === $this->lazy_load_embeds ) {
 			wp_add_inline_script( 'lozad', "
-				var observer = lozad('.lozad', {
-					rootMargin: '300px 0px',
-				    load: function(el) {
-				        postscribe(el, '<script src=' + el.getAttribute('data-src') + '><\/script>');
-				    }
-				});
-				observer.observe();
+				if (typeof lozad != 'undefined') {
+					window.addEventListener('load', function() {
+						var observer = lozad('.lozad', {
+							rootMargin: '300px 0px',
+						    load: function(el) {
+						        postscribe(el, '<script src=' + el.getAttribute('data-src') + '><\/script>');
+						    }
+						});
+						observer.observe();
+					});
+				}
 				"
 			);
 		}
