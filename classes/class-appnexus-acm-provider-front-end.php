@@ -112,6 +112,13 @@ class Appnexus_ACM_Provider_Front_End {
 	*/
 	public function add_scripts() {
 		if ( '1' === $this->lazy_load_all || '1' === $this->lazy_load_embeds ) {
+			// allow individual posts to disable lazyload. this can be useful in the case of unresolvable javascript conflicts.
+			if ( is_singular() ) {
+				global $post;
+				if ( get_post_meta( $post->ID, 'wp_lozad_lazyload_prevent_lozad_lazyload', true ) ) {
+					return;
+				}
+			}
 			wp_add_inline_script( 'lozad', "
 				if (typeof lozad != 'undefined') {
 					window.addEventListener('load', function() {
