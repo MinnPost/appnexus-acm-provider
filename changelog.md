@@ -1,6 +1,10 @@
 Changelog
 =========
 
+* 0.0.21 (2019-01-16)
+
+	* If a post is disabling lazy loading via a meta field supported by WP Lozad Lazyload plugin, don't include those scripts or try to transform the markup for the ads on that post.
+
 * 0.0.20 (2018-11-09)
 
 	* Use filters from separate WP Lozad Lazyload plugin to lazy load ads.
