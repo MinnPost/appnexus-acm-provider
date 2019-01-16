@@ -884,6 +884,14 @@ class Appnexus_ACM_Provider_Front_End {
 				if ( ! is_singular() ) {
 					$use_filter = false;
 				} // if we're only supposed to lazy load embeds, don't do it unless this is a singular post
+
+				// allow individual posts to disable lazyload. this can be useful in the case of unresolvable javascript conflicts.
+				if ( is_singular() ) {
+					global $post;
+					if ( get_post_meta( $post->ID, 'wp_lozad_lazyload_prevent_lozad_lazyload', true ) ) {
+						$use_filter = false;
+					}
+				}
 			}
 
 			// if the filter is enabled, try to transform the HTML to match lozad's requirements.
