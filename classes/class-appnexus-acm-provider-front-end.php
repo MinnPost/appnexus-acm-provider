@@ -137,8 +137,8 @@ class Appnexus_ACM_Provider_Front_End {
 	}
 
 	/**
-	* This method can cache the response from the DX ads.
-	* This method is apparently not usable in production yet.
+	* This method can cache the response for ads.
+	* We do use this method for the JX tags even though DX is not currently supported.
 	*
 	*/
 	public function store_ad_response() {

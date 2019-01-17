@@ -304,10 +304,10 @@ class Appnexus_ACM_Provider_Admin {
 							'text'  => 'SX',
 							'value' => 'sx',
 						),
-						'dx'  => array(
+						/*'dx'  => array(
 							'text'  => 'DX',
 							'value' => 'dx',
-						),
+						),*/
 					),
 				),
 			),
