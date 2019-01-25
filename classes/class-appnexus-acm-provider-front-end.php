@@ -409,8 +409,8 @@ class Appnexus_ACM_Provider_Front_End {
 	 */
 	public function insert_and_render_inline_ads( $content = '' ) {
 		if ( is_feed() ) {
-			global $wp_query;
-			$current_object = $wp_query;
+			global $post;
+			$current_object = $post;
 		} else {
 			$current_object = get_queried_object();
 		}
@@ -730,6 +730,9 @@ class Appnexus_ACM_Provider_Front_End {
 		if ( ! empty( $matching_ad_code ) ) {
 
 			$tag_type = $this->tag_type;
+			if ( is_feed() ) {
+				$tag_type = 'sx';
+			}
 			switch ( $tag_type ) {
 				case 'jx':
 					$tags = $tag_id;
@@ -852,6 +855,11 @@ class Appnexus_ACM_Provider_Front_End {
 	private function lazy_loaded_html_or_not( $output_html, $tag_id, $params = array() ) {
 		// check for lazy load filter
 		$use_filter = false;
+
+		if ( is_feed() ) {
+			return $output_html;
+		}
+
 		if ( array_key_exists( 'wp_lozad_lazyload_convert_html', $GLOBALS['wp_filter'] ) ) {
 			if ( '1' === $this->lazy_load_all ) {
 				$use_filter = true;
